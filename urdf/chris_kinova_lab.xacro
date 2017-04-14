@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<!-- m1n6_2 refers to mico v1 6DOF non-spherical 2fingers -->
+
+
+<robot xmlns:xi="http://www.w3.org/2001/XInclude"
+  xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz"
+  xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model"
+  xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+  xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
+  xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom"
+  xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint"
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+  xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering"
+  xmlns:renderable="http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable"
+  xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics"
+  xmlns:xacro="http://ros.org/wiki/xacro" name="m1n6s200">
+
+  <xacro:include filename="$(find chris_kinova_bringup)/urdf/common_properties.urdf.xacro" />
+
+  <xacro:include filename="$(find kinova_description)/urdf/m1n6s200.xacro"/>
+  <xacro:include filename="$(find chris_kinova_bringup)/urdf/sensors/kinect.urdf.xacro"/>
+  <xacro:include filename="$(find chris_kinova_bringup)/urdf/sensors/hokuyo_urg04.urdf.xacro"/>
+
+  <link name="base_plate">
+    <visual>
+      <origin xyz="0 0 -0.009525" rpy="0 0 0" />
+      <geometry>
+        <box size = "0.4064 0.762 0.01905"/>
+      </geometry>
+      <material name="material_blue" />
+    </visual>
+
+    <!--collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size = "0.25 0.25 0.02"/>
+      </geometry>
+    </collision-->
+  </link>
+  <gazebo reference="base_plate">
+    <material>Gazebo/WoodFloor</material>
+  </gazebo>
+
+  <link name="kinova_mount_base">
+    <visual>
+      <origin xyz="0 0 0.009525" rpy="0 0 0" />
+      <geometry>
+        <box size = "0.1461 0.1981 0.01905"/>
+      </geometry>
+      <material name="material_dark_grey" />
+    </visual>
+  </link>
+  <gazebo reference="kinova_mount_base">
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+
+  <link name="kinova_mount_post">
+    <visual>
+      <origin xyz="0 0 -0.0104" rpy="0 0 0" />
+      <geometry>
+        <box size = "0.03 0.03 0.0608"/>
+      </geometry>
+      <material name="material_dark_grey" />
+    </visual>
+
+  </link>
+  <gazebo reference="kinova_mount_post">
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+
+
+  <!-- for gazebo -->
+  <link name="world"/>
+
+  <joint name="connect_base_plate_and_world" type="fixed">
+    <parent link="world" />
+    <child link="base_plate" />
+    <origin xyz="0 0 0.01905" rpy="0 0 0" /> <!-- origin of base plate at top -->
+  </joint>
+
+  <joint name="connect_base_and_mount_plate" type="fixed">
+    <parent link="base_plate" />
+    <child link="kinova_mount_base" />
+    <origin xyz="0 0 0.0" rpy="0 0 0" />
+  </joint>
+
+  <joint name="connect_base_and_mount_post" type="fixed">
+    <parent link="base_plate" />
+    <child link="kinova_mount_post" />
+    <origin xyz="0 0 0.036" rpy="0 0 0" />
+  </joint>
+
+  <xacro:property name="robot_root" value="kinova_mount_post" />
+
+  <xacro:m1n6s200  base_parent="${robot_root}" use_ring_mesh="true" />
+
+  <joint name="kinect_base_joint" type="fixed">
+    <axis xyz="0 0 1" />
+    <origin xyz="-0.0508 0.2286 0.035" rpy="0 0 -0.1745"/>
+    <parent link="base_plate"/>
+    <child link="camera_link"/>
+  </joint>
+
+  <sensor_kinect  parent="base_plate"/>
+
+  <joint name="hokuyo_base_joint" type="fixed">
+    <axis xyz="0 0 1" />
+    <origin xyz="-0.073 -0.2286 0.019" rpy="0 0 0.1745"/>
+    <parent link="base_plate"/>
+    <child link="hokuyo_base_link"/>
+  </joint>
+  <xacro:hokuyo_urg04 lidar_name="hokuyo"/>
+
+
+
+</robot>

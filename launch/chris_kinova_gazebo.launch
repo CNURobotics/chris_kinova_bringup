@@ -1,0 +1,28 @@
+<launch>
+
+  <!-- these are the arguments you can pass this launch file, for example paused:=true -->
+  <arg name="robot_namespace"   default="/"/> <!-- robot's name used by plugin to publish topics -->
+  <arg name="robot_name"        default="m1n6s200"/>
+  <group ns="$(arg robot_namespace)">
+
+      <!-- Load the URDF into the ROS Parameter Server -->
+      <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find chris_kinova_bringup)/urdf/chris_kinova_lab.xacro'" />
+
+      <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+      <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+        args="-urdf -model $(arg robot_name) -param robot_description"/>
+
+        <node pkg="laser_filters" type="scan_to_scan_filter_chain" output="screen" name="laser_filter" ns="$(arg robot_namespace)">
+              <remap from="scan"          to="hokuyo_node/scan_raw" />
+              <remap from="scan_filtered" to="hokuyo_node/scan" />
+              <rosparam command="load" file="$(find chris_kinova_bringup)/param/laser_filters.yaml" />
+        </node>
+
+      <!-- ros_control launch file -->
+      <include file="$(find kinova_control)/launch/kinova_moveit_control.launch">
+        <arg name="robot_name" value="$(arg robot_name)"/>
+      </include>
+
+  </group>
+
+</launch>

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>chris_kinova_bringup</name>
+  <version>0.0.1</version>
+  <description>Launch scripts for gazebo and actual hardware</description>
+
+  <!-- One maintainer tag required, multiple allowed, one person per tag -->
+  <maintainer email="david.conner@cnu.edu">David Conner</maintainer>
+
+
+  <!-- One license tag required, multiple allowed, one license per tag -->
+  <license>BSD</license>
+
+
+  <!-- Url tags are optional, but mutiple are allowed, one per tag -->
+  <!-- Optional attribute type can be: website, bugtracker, or repository -->
+ <url type="website">https://github.com/CNURobotics/chris_kinova_bringup</url>
+
+
+  <!-- Author tags are optional, mutiple are allowed, one per tag -->
+  <author email="david.conner@cnu.edu">David Conner</author>
+
+
+  <!-- The *_depend tags are used to specify dependencies -->
+  <!-- Dependencies can be catkin packages or system dependencies -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>kinova_bringup</depend>
+  <depend>kinova_description</depend>
+  <depend>robot_state_publisher</depend>
+  <depend>tf2_ros</depend>
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+  </export>
+</package>
