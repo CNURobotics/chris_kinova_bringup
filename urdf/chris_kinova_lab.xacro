@@ -88,7 +88,7 @@
   <joint name="connect_base_and_mount_post" type="fixed">
     <parent link="base_plate" />
     <child link="kinova_mount_post" />
-    <origin xyz="0 0 0.036" rpy="0 0 0" />
+    <origin xyz="0 0 0.036" rpy="0 0 ${M_PI/2}" />
   </joint>
 
   <xacro:property name="robot_root" value="kinova_mount_post" />
@@ -97,7 +97,7 @@
 
   <joint name="kinect_base_joint" type="fixed">
     <axis xyz="0 0 1" />
-    <origin xyz="-0.0508 0.2286 0.035" rpy="0 0 -0.1745"/>
+    <origin xyz="-0.0508 0.2286 0.035" rpy="0 0 ${-0.174533}"/>
     <parent link="base_plate"/>
     <child link="camera_link"/>
   </joint>
@@ -106,7 +106,7 @@
 
   <joint name="hokuyo_base_joint" type="fixed">
     <axis xyz="0 0 1" />
-    <origin xyz="-0.073 -0.2286 0.019" rpy="0 0 0.1745"/>
+    <origin xyz="-0.073 -0.2286 0.019" rpy="0 0 ${0.174533}"/>
     <parent link="base_plate"/>
     <child link="hokuyo_base_link"/>
   </joint>
