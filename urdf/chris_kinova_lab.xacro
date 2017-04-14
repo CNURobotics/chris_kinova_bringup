@@ -55,7 +55,7 @@
     <material>Gazebo/DarkGrey</material>
   </gazebo>
 
-  <link name="kinova_mount_post">
+  <link name="root">
     <visual>
       <origin xyz="0 0 -0.0104" rpy="0 0 0" />
       <geometry>
@@ -65,7 +65,7 @@
     </visual>
 
   </link>
-  <gazebo reference="kinova_mount_post">
+  <gazebo reference="root">
     <material>Gazebo/DarkGrey</material>
   </gazebo>
 
@@ -87,11 +87,11 @@
 
   <joint name="connect_base_and_mount_post" type="fixed">
     <parent link="base_plate" />
-    <child link="kinova_mount_post" />
+    <child link="root" />
     <origin xyz="0 0 0.036" rpy="0 0 ${M_PI/2}" />
   </joint>
 
-  <xacro:property name="robot_root" value="kinova_mount_post" />
+  <xacro:property name="robot_root" value="root" />
 
   <xacro:m1n6s200  base_parent="${robot_root}" use_ring_mesh="true" />
 
