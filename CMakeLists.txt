@@ -12,6 +12,9 @@ find_package(catkin REQUIRED COMPONENTS
   kinova_description
 )
 
+find_package(octomap REQUIRED)
+include_directories(${OCTOMAP_INCLUDE_DIRS})
+link_libraries(${OCTOMAP_LIBRARIES})
 
 catkin_package( )
 

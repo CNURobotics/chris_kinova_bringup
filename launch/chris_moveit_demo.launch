@@ -81,6 +81,9 @@
 				      move_group/MoveGroupGetPlanningSceneService
 				      move_group/ApplyPlanningSceneService
 				      move_group/ClearOctomapService
+				      move_group/OctomapAccessCapability
+				      move_group/MoveGroupManipulationAction
+				      move_group/RobotStateRetrievalCapability
 				      " />
 
     <!-- Publish the planning scene of the physical robot so that rviz plugin can know actual robot -->
@@ -97,5 +100,11 @@
     <arg name="config" value="true"/>
     <arg name="debug" value="$(arg debug)"/>
   </include>
+
+  <rosparam command="load" file="$(find chris_kinova_bringup)/param/sensor.yaml" />
+  <param name="octomap_frame" type="string" value="odom_combined" />
+  <param name="octomap_resolution" type="double" value="0.05" />
+  <param name="max_range" type="double" value="5.0" />
+
 
 </launch>
