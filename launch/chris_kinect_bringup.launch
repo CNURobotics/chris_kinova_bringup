@@ -5,6 +5,8 @@
 
 -->
 <launch>
+  <arg name="robot_namespace"   default="/"/> <!-- robot's name used by plugin to publish topics -->
+  <arg name="base_prefix"       default="base_plate" />
 
   <!-- Load the Kinect drivers for the CNU Lab setup -->
   <group ns="$(arg robot_namespace)">
