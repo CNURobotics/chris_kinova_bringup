@@ -20,6 +20,11 @@ To bring up the equivalent setup on hardware:
 roscore
 roslaunch chris_kinova_bringup chris_kinova_bringup.launch
 rosrun  kinova_driver  joint_trajectory_action_server m1n6s200
-roslaunch kinova_control kinova_moveit_control.launch
 roslaunch chris_kinova_bringup chris_moveit_demo.launch
 ```
+
+TRASH:
+```
+roslaunch kinova_control kinova_moveit_control.launch
+```
+Single joint control , needs controller manager

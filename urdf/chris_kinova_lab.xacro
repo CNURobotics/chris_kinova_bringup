@@ -97,7 +97,7 @@
 
   <joint name="kinect_base_joint" type="fixed">
     <axis xyz="0 0 1" />
-    <origin xyz="-0.0508 0.2286 0.035" rpy="0 0 ${-0.174533}"/>
+    <origin xyz="-0.30 0.25 0.016" rpy="0 -0.05 -0.174533"/>
     <parent link="base_plate"/>
     <child link="camera_link"/>
   </joint>
@@ -106,7 +106,7 @@
 
   <joint name="hokuyo_base_joint" type="fixed">
     <axis xyz="0 0 1" />
-    <origin xyz="-0.073 -0.2286 0.019" rpy="0 0 ${0.174533}"/>
+    <origin xyz="0.105 0.0 0.019" rpy="0 0 0"/>
     <parent link="base_plate"/>
     <child link="hokuyo_base_link"/>
   </joint>
