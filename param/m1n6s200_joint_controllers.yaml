@@ -1,0 +1,56 @@
+finger_1_position_controller:
+  joint: m1n6s200_joint_finger_1
+  pid:
+    d: 0
+    i: 0
+    p: 10
+  type: effort_controllers/JointPositionController
+finger_2_position_controller:
+  joint: m1n6s200_joint_finger_2
+  pid:
+    d: 0
+    i: 0
+    p: 10
+  type: effort_controllers/JointPositionController
+joint_1_position_controller:
+  joint: m1n6s200_joint_1
+  pid:
+    d: 0
+    i: 0
+    p: 5000
+  type: effort_controllers/JointPositionController
+joint_2_position_controller:
+  joint: m1n6s200_joint_2
+  pid:
+    d: 0
+    i: 0
+    p: 5000
+  type: effort_controllers/JointPositionController
+joint_3_position_controller:
+  joint: m1n6s200_joint_3
+  pid:
+    d: 0
+    i: 0
+    p: 5000
+  type: effort_controllers/JointPositionController
+joint_4_position_controller:
+  joint: m1n6s200_joint_4
+  pid:
+    d: 0
+    i: 0
+    p: 500
+  type: effort_controllers/JointPositionController
+joint_5_position_controller:
+  joint: m1n6s200_joint_5
+  pid:
+    d: 0
+    i: 0
+    p: 200
+  type: effort_controllers/JointPositionController
+joint_6_position_controller:
+  joint: m1n6s200_joint_6
+  pid:
+    d: 0
+    i: 0
+    p: 500
+  type: effort_controllers/JointPositionController

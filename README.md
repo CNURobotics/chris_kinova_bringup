@@ -2,11 +2,15 @@ chris_kinova_bringup
 ===================
 
 This package launches nodes used in our lab setup with Kinova m1n6s200 robot arm.
-The bringup make some adjustments to the default Kinova topic names.
 
 
-This package includes options for bringing the robot arm standalone as ```kinova```, or
+This package depends on the modified ``cnu_mico`` branch of ``kinova-ros`` as it
+makes some adjustments to the default Kinova topic names.
+
+
+This package includes options for bringing the robot arm standalone as ```kinova_robot```, or
 in our lab configuration with a Hokuyo Lidar and Kinect sensor as ```kinova_lab```.
+
 
 # Startup instructions
 
@@ -14,14 +18,14 @@ First start a ```roscore``` node on the designated machine, with networking conf
 appropriately.
 
 ## Simulation
-First launch the base Gazebo simulatin framework.
+Launch the base Gazebo simulation environment:
 ```
-roscore
 roslaunch gazebo_ros empty_world.launch
 ```
+We start Gazebo separately to allow easier configuration of world workspace models.
 You may replace the ```empty_world``` with any desired Gazebo world file.
 
-Then choose the appropriate hardware simulation.
+Then choose the appropriate device simulation.
 
 1. For a stand alone robot arm, use:
 
@@ -53,20 +57,36 @@ roslaunch chris_kinova_bringup chris_kinova_robot_hardware.launch
 ```
 roslaunch chris_kinova_bringup chris_kinova_lab_hardware.launch
 ```
+The lab set up includes transformations between the sensors and the robot.
 
-Then run
+For either hardware setup run,
 ```
 rosrun  kinova_driver  joint_trajectory_action_server m1n6s200
 ```
-to start the controller interfaces for either setup.
+to start the controller interfaces.
+This starts up the ....<Later>.
 
 ## Arm Controllers
 
-With either simulation or hardware, run
+With either simulation or hardware, choose either:
+
+1. Trajectory controllers (that interface with MoveIt!)
 
 ```
-roslaunch chris_kinova_bringup chris_kinova_controllers.launch
+roslaunch chris_kinova_bringup chris_kinova_trajectory_controllers.launch
 ```
+
+or
+
+2. Individual joint controllers
+
+```
+roslaunch chris_kinova_bringup chris_kinova_joint_controllers.launch
+```
+
+Starting both will result in a resource conflict, unless you modify the ``start_controllers`` parameter to ``--stopped``.
+
+
 
 ## MoveIt Planning Software
 
@@ -74,7 +94,8 @@ With either simulation or hardware, run
 ```
 roslaunch chris_kinova_bringup chris_moveit_demo.launch
 ```
-which starts the MoveIt! planning system.
+which starts the MoveIt! planning system which interfaces with the trajectory controllers.
+
 This launch includes the RViz visualization with
 MoveIt! control plugin.
 

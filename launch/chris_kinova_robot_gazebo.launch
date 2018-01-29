@@ -20,10 +20,16 @@
           <remap from="/joint_states" to="$(arg robot_name)_driver/joint_states" />
         </node>
 
+        <rosparam file="$(find chris_kinova_bringup)/param/$(arg robot_name)_joint_state_controllers.yaml"
+             ns="$(arg robot_name)_driver" command="load"/>
+
         <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
           output="screen" ns="$(arg robot_name)_driver"
-          args="joint_state_controller"/>
+          args="joint_state_controller">
+        </node>
 
   </group>
+
+
 
 </launch>
