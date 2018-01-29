@@ -26,5 +26,10 @@
         <remap from="joint_states" to="$(arg kinova_robotName)_driver/joint_states"/>
       </node>
 
+      <!-- temporary : Kinova's kludge action server -->
+      <node name="$(arg kinova_robotName)_fjtas" pkg="kinova_driver" type="joint_trajectory_action_server" output="screen" cwd="node" args="$(arg kinova_robotType)">
+        <remap from="/$(arg kinova_robotName)/follow_joint_trajectory"  to="$(arg kinova_robotName)_driver/follow_joint_trajectory"/>
+      </node>
+
   </group> <!-- end of robot_namespace -->
 </launch>
