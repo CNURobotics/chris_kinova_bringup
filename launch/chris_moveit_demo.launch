@@ -1,7 +1,9 @@
 <launch>
-  <param name="robot_type" value="m1n6s200" />
+  <arg name="kinova_robotType" default="$(optenv KINOVA_ARM m1n6s200)" />
+  <arg name="kinova_robotName" default="$(arg kinova_robotType)"/>
   <arg name="debug" default="false" />  <!-- By default, we are not in debug mode -->
   <arg name="verbose" default="$(arg debug)" />
+  <arg name="moveit_config" default="$(arg kinova_robotType)_moveit_config" />
 
   <!-- This is a stripped down version of m1n6s200_moveit_demo.launch
        By default, we do not start a database (it can be large)
@@ -21,21 +23,13 @@
 
   <!-- Load default settings for kinematics; these settings are overridden by settings in a node's namespace -->
   <group ns="robot_description_kinematics">
-    <rosparam command="load" file="$(find m1n6s200_moveit_config)/config/kinematics.yaml"/>
+    <rosparam command="load" file="$(find $(arg moveit_config))/config/kinematics.yaml"/>
   </group>
-
-  <!-- Run the main MoveIt executable without fake trajectory execution -->
-  <!--include file="$(find m1n6s200_moveit_config)/launch/move_group_m1n6s200.launch">
-    <arg name="allow_trajectory_execution" value="true"/>
-    <arg name="fake_execution" value="false"/>
-    <arg name="info" value="true"/>
-    <arg name="debug" value="$(arg debug)"/>
-  </include -->
 
   <!-- GDB Debug Option -->
   <arg unless="$(arg debug)" name="launch_prefix" value="" />
   <arg     if="$(arg debug)" name="launch_prefix"
-	   value="gdb -x $(find m1n6s200_moveit_config)/launch/gdb_settings.gdb --ex run --args" />
+     value="gdb -x $(find m1n6s200_moveit_config)/launch/gdb_settings.gdb --ex run --args" />
 
   <!-- Verbose Mode Option -->
   <arg unless="$(arg verbose)" name="command_args" value="" />
@@ -76,19 +70,19 @@
 
     <!-- MoveGroup capabilities to load -->
     <param name="capabilities" value="move_group/MoveGroupCartesianPathService
-				      move_group/MoveGroupExecuteTrajectoryAction
-				      move_group/MoveGroupKinematicsService
-				      move_group/MoveGroupMoveAction
-				      move_group/MoveGroupPickPlaceAction
-				      move_group/MoveGroupPlanService
-				      move_group/MoveGroupQueryPlannersService
-				      move_group/MoveGroupStateValidationService
-				      move_group/MoveGroupGetPlanningSceneService
-				      move_group/ApplyPlanningSceneService
-				      move_group/ClearOctomapService
-				      "
+              move_group/MoveGroupExecuteTrajectoryAction
+              move_group/MoveGroupKinematicsService
+              move_group/MoveGroupMoveAction
+              move_group/MoveGroupPickPlaceAction
+              move_group/MoveGroupPlanService
+              move_group/MoveGroupQueryPlannersService
+              move_group/MoveGroupStateValidationService
+              move_group/MoveGroupGetPlanningSceneService
+              move_group/ApplyPlanningSceneService
+              move_group/ClearOctomapService
+              "
               />
-				      <!--
+              <!--
               move_group/MoveGroupManipulationAction
               move_group/RobotStateRetrievalCapability
               move_group/OctomapAccessCapability

@@ -1,0 +1,48 @@
+<!--
+  This launches the Kinova m1n6s200 robot arm with Kinect and Hokuyo lidar sensors
+-->
+<launch>
+  <arg name="robot_namespace"        default="/"/> <!-- robot's name used by plugin to publish topics -->
+  <arg name="base_prefix"            default="base_plate" />
+  <arg name="kinova_robotType"       default="m1n6s200" />
+  <arg name="kinova_robotName"       default="$(arg kinova_robotType)"/>
+  <arg name="kinova_robotSerial"     default="not_set" />
+  <arg name="use_lidar"              default="true"/>
+  <arg name="robot_description_file" default="$(find chris_kinova_bringup)/urdf/chris_kinova_lab.xacro" />
+
+  <!-- Bring up the robot arm with description that includes sensor setup for our lab -->
+  <include file="$(find chris_kinova_bringup)/launch/chris_kinova_bringup.launch">
+    <arg name="robot_namespace"        value="$(arg robot_namespace)"/>
+    <arg name="base_prefix"            value="$(arg base_prefix)" />
+    <arg name="kinova_robotType"       value="$(arg kinova_robotType)" />
+    <arg name="kinova_robotName"       value="$(arg kinova_robotName)"/>
+  	<arg name="kinova_robotSerial"     value="$(arg kinova_robotSerial)" />
+    <arg name="robot_description_file" value="$(find kinova_description)/urdf/$(arg kinova_robotType)_standalone.xacro" />
+  </include>
+
+  <!-- Load the Kinect drivers for the CNU Lab setup -->
+  <group ns="$(arg robot_namespace)">
+
+      <include file="$(find chris_kinova_bringup)/launch/chris_kinect_bringup.launch">
+        <arg name="robot_namespace"        value="$(arg robot_namespace)"/>
+        <arg name="base_prefix"            value="$(arg base_prefix)" />
+      </include>
+
+
+      <group if="$(arg use_lidar)">
+          <!-- LIDAR interface -->
+          <node name="hokuyo_node" pkg="urg_node" type="urg_node" >
+             <param name="frame_id"     value="hokuyo_laser" />
+             <remap from="scan"         to="hokuyo_node/scan_raw" />
+             <remap from="/diagnostics" to="diagnostics"/>
+          </node>
+
+          <node pkg="laser_filters" type="scan_to_scan_filter_chain" output="screen" name="laser_filter" ns="$(arg robot_namespace)">
+                <remap from="scan"          to="hokuyo_node/scan_raw" />
+                <remap from="scan_filtered" to="hokuyo_node/scan" />
+                <rosparam command="load" file="$(find chris_kinova_bringup)/param/laser_filters.yaml" />
+          </node>
+      </group>
+
+  </group> <!-- end of robot_namespace -->
+</launch>

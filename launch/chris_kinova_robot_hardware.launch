@@ -1,0 +1,30 @@
+<!--
+  This launches the Kinova m1n6s200 robot arm with topic remapping
+-->
+<launch>
+  <arg name="robot_namespace"        default="/"/>
+  <arg name="base_prefix"            default="base_plate" />
+  <arg name="kinova_robotType"       default="$(optenv KINOVA_ARM m1n6s200)" />
+  <arg name="kinova_robotName"       default="$(arg kinova_robotType)"/>
+  <arg name="kinova_robotSerial"     default="not_set" />
+  <arg name="robot_description_file" default="$(find kinova_description)/urdf/$(arg kinova_robotType)_standalone.xacro" />
+
+  <!-- Load the Kinova driver for robot arm -->
+  <group ns="$(arg robot_namespace)">
+
+      <param name="robot_description" command="$(find xacro)/xacro --inorder '$(arg robot_description_file)'" />
+
+      <node name="$(arg kinova_robotName)_driver" pkg="kinova_driver" type="kinova_arm_driver" output="screen" cwd="node" args="$(arg kinova_robotType)">
+        <rosparam file="$(find kinova_bringup)/launch/config/robot_parameters.yaml" command="load" />
+        <param name="serial_number" value="$(arg kinova_robotSerial)" />
+        <param name="robot_name" value="$(arg kinova_robotName)" />
+        <param name="robot_type" value="$(arg kinova_robotType)" />
+        <remap from="/$(arg kinova_robotName)_driver/out/joint_state"  to="$(arg kinova_robotName)_driver/joint_states"/>
+      </node>
+
+      <node name="$(arg kinova_robotName)_state_publisher" pkg="robot_state_publisher"  type="robot_state_publisher">
+        <remap from="joint_states" to="$(arg kinova_robotName)_driver/joint_states"/>
+      </node>
+
+  </group> <!-- end of robot_namespace -->
+</launch>

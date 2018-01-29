@@ -1,0 +1,29 @@
+<launch>
+
+  <!-- these are the arguments you can pass this launch file, for example paused:=true -->
+  <arg name="robot_namespace"        default="/"/> <!-- robot's name used by plugin to publish topics -->
+  <arg name="kinova_robotType"       default="$(optenv KINOVA_ARM m1n6s200)" />
+  <arg name="robot_name"             default="$(arg kinova_robotType)"/>
+  <arg name="robot_description_file" default="$(find kinova_description)/urdf/$(arg kinova_robotType)_standalone.xacro" />
+
+  <group ns="$(arg robot_namespace)">
+
+      <!-- Load the URDF into the ROS Parameter Server -->
+      <param name="robot_description" command="$(find xacro)/xacro --inorder '$(arg robot_description_file)'" />
+
+      <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot based on description -->
+      <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+        args="-urdf -model $(arg robot_name) -param robot_description"/>
+
+        <!-- This launches the joint states publisher and joint_state_controller for simulation -->
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
+          <remap from="/joint_states" to="$(arg robot_name)_driver/joint_states" />
+        </node>
+
+        <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+          output="screen" ns="$(arg robot_name)_driver"
+          args="joint_state_controller"/>
+
+  </group>
+
+</launch>
