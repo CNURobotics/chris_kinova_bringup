@@ -31,12 +31,12 @@ arm_controller:
       goal: 0.01                     # Not enforced if unspecified
 
   gains: # Required because we're controlling an effort interface
-    m1n6s200_joint_1: {p: 400.0, d: 0.3, i: 24.0, i_clamp:  8.0}
-    m1n6s200_joint_2: {p: 900.0, d: 0.4, i: 36.0, i_clamp: 16.0}
-    m1n6s200_joint_3: {p: 600.0, d: 0.4, i: 36.0, i_clamp: 16.0}
-    m1n6s200_joint_4: {p: 500.0, d: 0.3, i: 24.0, i_clamp:  4.0}
-    m1n6s200_joint_5: {p: 300.0, d: 0.2, i: 18.0, i_clamp:  4.0}
-    m1n6s200_joint_6: {p: 200.0, d: 0.2, i: 12.0, i_clamp:  1.0}
+    m1n6s200_joint_1: {p: 200.0, d: 0.20, i: 24.0, i_clamp:  8.0}
+    m1n6s200_joint_2: {p: 450.0, d: 0.30, i: 36.0, i_clamp: 16.0}
+    m1n6s200_joint_3: {p: 300.0, d: 0.30, i: 36.0, i_clamp: 16.0}
+    m1n6s200_joint_4: {p: 250.0, d: 0.15, i: 24.0, i_clamp:  4.0}
+    m1n6s200_joint_5: {p: 150.0, d: 0.10, i: 18.0, i_clamp:  4.0}
+    m1n6s200_joint_6: {p: 100.0, d: 0.10, i: 12.0, i_clamp:  1.0}
 
   state_publish_rate:  250            # Override default
   action_monitor_rate:  50            # Override default
