@@ -67,31 +67,36 @@
     <param name="octomap_frame" type="string" value="move_group/monitored_planning_scene" />
     <param name="octomap_resolution" type="double" value="0.05" />
     <param name="max_range" type="double" value="5.0" />
-
-    <!-- MoveGroup capabilities to load -->
-    <param name="capabilities" value="move_group/MoveGroupCartesianPathService
-              move_group/MoveGroupExecuteTrajectoryAction
-              move_group/MoveGroupKinematicsService
-              move_group/MoveGroupMoveAction
-              move_group/MoveGroupPickPlaceAction
-              move_group/MoveGroupPlanService
-              move_group/MoveGroupQueryPlannersService
-              move_group/MoveGroupStateValidationService
-              move_group/MoveGroupGetPlanningSceneService
-              move_group/ApplyPlanningSceneService
-              move_group/ClearOctomapService
+    <param name="end_effector_base_link" type="string" value="m1n6s200_link_6" />
+    <!-- Additional MoveGroup capabilities to load -->
+    <param name="capabilities" value="
+              flexible_manipulation/MoveGroupExtendedAction
+              flexible_manipulation/GetPlanningGroupConfigAction
+              flexible_manipulation/OctomapAccessCapability
               "
               />
-              <!--
-              move_group/MoveGroupManipulationAction
-              move_group/RobotStateRetrievalCapability
-              move_group/OctomapAccessCapability
-              -->
+    <!-- allow default capabilities
+         move_group/MoveGroupExecuteTrajectoryAction
+         move_group/MoveGroupMoveAction
+         move_group/MoveGroupPickPlaceAction
+         move_group/MoveGroupPlanService
+         move_group/MoveGroupCartesianPathService
+         move_group/MoveGroupKinematicsService
+         move_group/MoveGroupQueryPlannersService
+         move_group/MoveGroupStateValidationService
+         move_group/MoveGroupGetPlanningSceneService
+         move_group/ApplyPlanningSceneService
+         move_group/ClearOctomapService
+      -->
+
+    <!-- Disable the default capabilities -->
+    <param name="disable_capabilities" value="
+              " />
 
     <!-- Publish the planning scene of the physical robot so that rviz plugin can know actual robot -->
-    <param name="planning_scene_monitor/publish_planning_scene" value="$(arg publish_monitored_planning_scene)" />
-    <param name="planning_scene_monitor/publish_geometry_updates" value="$(arg publish_monitored_planning_scene)" />
-    <param name="planning_scene_monitor/publish_state_updates" value="$(arg publish_monitored_planning_scene)" />
+    <param name="planning_scene_monitor/publish_planning_scene"     value="$(arg publish_monitored_planning_scene)" />
+    <param name="planning_scene_monitor/publish_geometry_updates"   value="$(arg publish_monitored_planning_scene)" />
+    <param name="planning_scene_monitor/publish_state_updates"      value="$(arg publish_monitored_planning_scene)" />
     <param name="planning_scene_monitor/publish_transforms_updates" value="$(arg publish_monitored_planning_scene)" />
 
     <remap from="/joint_states" to="/m1n6s200_driver/joint_states" />
