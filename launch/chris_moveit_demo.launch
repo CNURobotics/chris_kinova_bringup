@@ -73,24 +73,34 @@
               flexible_manipulation/MoveGroupExtendedAction
               flexible_manipulation/GetPlanningGroupConfigAction
               flexible_manipulation/OctomapAccessCapability
+              flexible_manipulation/ClearOctomapCapability
+              flexible_manipulation/ApplyPlanningSceneCapability
+              flexible_manipulation/ExecuteKnownTrajectoryCapability
+              flexible_manipulation/GetCartesianPathCapability
+              flexible_manipulation/GetPlanningSceneCapability
+              flexible_manipulation/KinematicsCapability
+              flexible_manipulation/MoveGroupPlanCapability
+              flexible_manipulation/QueryPlannersCapability
+              flexible_manipulation/StateValidationCapability
               "
               />
     <!-- allow default capabilities
-         move_group/MoveGroupExecuteTrajectoryAction
          move_group/MoveGroupMoveAction
          move_group/MoveGroupPickPlaceAction
-         move_group/MoveGroupPlanService
          move_group/MoveGroupCartesianPathService
-         move_group/MoveGroupKinematicsService
-         move_group/MoveGroupQueryPlannersService
-         move_group/MoveGroupStateValidationService
-         move_group/MoveGroupGetPlanningSceneService
-         move_group/ApplyPlanningSceneService
-         move_group/ClearOctomapService
       -->
 
     <!-- Disable the default capabilities -->
     <param name="disable_capabilities" value="
+              move_group/ClearOctomapService
+              move_group/ApplyPlanningSceneService
+              move_group/MoveGroupExecuteTrajectoryAction
+              move_group/MoveGroupCartesianPathService
+              move_group/MoveGroupPlanService
+              move_group/MoveGroupGetPlanningSceneService
+              move_group/MoveGroupKinematicsService
+              move_group/MoveGroupQueryPlannersService
+              move_group/MoveGroupStateValidationService
               " />
 
     <!-- Publish the planning scene of the physical robot so that rviz plugin can know actual robot -->
