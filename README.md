@@ -27,13 +27,13 @@ You may replace the ```empty_world``` with any desired Gazebo world file.
 
 Then choose the appropriate device simulation.
 
-1. For a stand alone robot arm, use:
+* For a stand alone robot arm, use:
 
 ```
 roslaunch chris_kinova_bringup chris_kinova_robot_gazebo.launch
 ```
 
-2. For our lab configuration with the single robot arm, Hokuyo lidar,
+* For our lab configuration with the single robot arm, Hokuyo lidar,
 and Kinect sensor use:
 
 ```
@@ -46,13 +46,13 @@ Only use one of the ```_gazebo.launch``` files.
 
 To launch the equivalent nodes in the robot hardware, use either:
 
-1. Standalone arm
+* Standalone arm
 
 ```
 roslaunch chris_kinova_bringup chris_kinova_robot_hardware.launch
 ```
 
-2. Lab setup with a single robot arm and Kinect and Hokuyo LIDAR sensors
+* Lab setup with a single robot arm and Kinect and Hokuyo LIDAR sensors
 
 ```
 roslaunch chris_kinova_bringup chris_kinova_lab_hardware.launch
@@ -70,7 +70,7 @@ This starts up the ....<Later>.
 
 With either simulation or hardware, choose either:
 
-1. Trajectory controllers (that interface with MoveIt!)
+* Trajectory controllers (that interface with MoveIt!)
 
 ```
 roslaunch chris_kinova_bringup chris_kinova_trajectory_controllers.launch
@@ -78,7 +78,7 @@ roslaunch chris_kinova_bringup chris_kinova_trajectory_controllers.launch
 
 or
 
-2. Individual joint controllers
+* Individual joint controllers
 
 ```
 roslaunch chris_kinova_bringup chris_kinova_joint_controllers.launch
