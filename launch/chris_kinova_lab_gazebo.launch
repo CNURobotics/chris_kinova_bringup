@@ -3,16 +3,22 @@
   <!-- these are the arguments you can pass this launch file, for example paused:=true -->
   <arg name="robot_namespace"        default="/"/> <!-- robot's name used by plugin to publish topics -->
   <arg name="kinova_robotType"       default="m1n6s200" />
-  <arg name="robot_name"             default="m1n6s200"/>
+  <arg name="kinova_robotName"       default="m1n6s200"/>
   <arg name="robot_description_file" default="$(find chris_kinova_bringup)/urdf/chris_kinova_lab.xacro" />
   <arg name="use_lidar"              default="true"/>
+  <arg name="is7dof"                 default="false"/>
+  <arg name="has2finger"             default="true"/>
+
 
   <!-- launch the base robot simulation based on given robot description -->
   <include file="$(find chris_kinova_bringup)/launch/chris_kinova_robot_gazebo.launch">
     <arg name="robot_namespace"        value="$(arg robot_namespace)"/>
     <arg name="kinova_robotType"       value="$(arg kinova_robotType)" />
-    <arg name="robot_name"             value="$(arg robot_name)"/>
-    <arg name="robot_description_file" value="$(arg robot_description_file" />
+    <arg name="kinova_robotName"       value="$(arg kinova_robotName)"/>
+    <arg name="robot_description_file" value="$(arg robot_description_file)" />
+    <arg name="is7dof"                 value="$(arg is7dof)"/>
+    <arg name="has2finger"             value="$(arg has2finger)"/>
+
   </include>
 
   <!-- launch sensor suite (Kinect camera plugin included in lab robot description )-->
