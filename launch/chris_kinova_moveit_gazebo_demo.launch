@@ -17,17 +17,8 @@
     <arg name="load_robot_description" value="false"/> <!-- do not reload config -->
   </include>
 
-
-
-
-
-
-
-
-
-
   <!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
-  <include file="$(find chris_kinova_bringup)/launch/chris_move_group_m1n6s200.launch">
+  <include file="$(find chris_kinova_bringup)/launch/chris_kinova_move_group.launch">
     <arg name="allow_trajectory_execution" value="true"/>
     <arg name="fake_execution" value="false"/>
     <arg name="info" value="true"/>
