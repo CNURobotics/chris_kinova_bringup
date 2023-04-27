@@ -14,7 +14,7 @@
   xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering"
   xmlns:renderable="http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable"
   xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics"
-  xmlns:xacro="http://ros.org/wiki/xacro" name="m1n6s200">
+  xmlns:xacro="http://www.ros.org/wiki/xacro" name="m1n6s200">
 
   <xacro:include filename="$(find chris_kinova_bringup)/urdf/common_properties.urdf.xacro" />
 
@@ -93,7 +93,7 @@
 
   <xacro:property name="robot_root" value="root" />
 
-  <xacro:m1n6s200  base_parent="${robot_root}" use_ring_mesh="true" />
+  <xacro:m1n6s200  base_parent="${robot_root}"  />
 
   <joint name="kinect_base_joint" type="fixed">
     <axis xyz="0 0 1" />

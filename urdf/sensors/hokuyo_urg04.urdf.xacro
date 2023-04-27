@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!-- Hokoyu URG-04 lidar model (Simple) -->
-<robot name="hokuyo_urg04" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="hokuyo_urg04" xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:macro name="hokuyo_urg04" params="lidar_name">
 
   <!-- Constants for robot dimensions -->

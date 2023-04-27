@@ -1,5 +1,3 @@
 <launch>
-
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find chris_kinova_bringup)/param/chris_kinova_rviz.rviz"/>
-
 </launch>
