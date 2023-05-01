@@ -28,15 +28,15 @@
       <geometry>
         <box size = "0.4064 0.762 0.01905"/>
       </geometry>
-      <material name="material_blue" />
+      <!-- material name="material_blue" / -->
     </visual>
 
-    <!--collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+    <collision>
+      <origin xyz="0 0 -0.009525" rpy="0 0 0" />
       <geometry>
-        <box size = "0.25 0.25 0.02"/>
+        <box size = "0.4064 0.762 0.01905"/>
       </geometry>
-    </collision-->
+    </collision>
   </link>
   <gazebo reference="base_plate">
     <material>Gazebo/WoodFloor</material>
@@ -48,8 +48,14 @@
       <geometry>
         <box size = "0.1461 0.1981 0.01905"/>
       </geometry>
-      <material name="material_dark_grey" />
+      <!-- material name="material_dark_grey" / -->
     </visual>
+    <collision>
+      <origin xyz="0 0 0.009525" rpy="0 0 0" />
+      <geometry>
+        <box size = "0.1461 0.1981 0.01905"/>
+      </geometry>
+    </collision>
   </link>
   <gazebo reference="kinova_mount_base">
     <material>Gazebo/DarkGrey</material>
@@ -61,8 +67,15 @@
       <geometry>
         <box size = "0.03 0.03 0.0608"/>
       </geometry>
-      <material name="material_dark_grey" />
+      <!-- material name="material_dark_grey" /-->
     </visual>
+    <collision>
+      <origin xyz="0 0 -0.0104" rpy="0 0 0" />
+      <geometry>
+        <box size = "0.03 0.03 0.0608"/>
+      </geometry>
+      <!-- material name="material_dark_grey" /-->
+    </collision>
 
   </link>
   <gazebo reference="root">
@@ -102,7 +115,7 @@
     <child link="camera_link"/>
   </joint>
 
-  <sensor_kinect  parent="base_plate"/>
+  <xacro:sensor_kinect  parent="base_plate"/>
 
   <joint name="hokuyo_base_joint" type="fixed">
     <axis xyz="0 0 1" />

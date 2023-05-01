@@ -62,7 +62,7 @@
   </link>
 
   <!-- Simulation sensors -->
-  <hokuyo_urg04_sim/>
+  <xacro:hokuyo_urg04_sim/>
 
   </xacro:macro>
 </robot>
