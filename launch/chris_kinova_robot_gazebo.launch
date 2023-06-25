@@ -3,30 +3,84 @@
   <!-- these are the arguments you can pass this launch file, for example paused:=true -->
   <arg name="robot_namespace"        default="/"/> <!-- robot's name used by plugin to publish topics -->
   <arg name="kinova_robotType"       default="$(optenv KINOVA_ARM m1n6s200)" />
-  <arg name="robot_name"             default="$(arg kinova_robotType)"/>
+  <arg name="kinova_robotName"       default="$(arg kinova_robotType)"/>
   <arg name="robot_description_file" default="$(find kinova_description)/urdf/$(arg kinova_robotType)_standalone.xacro" />
+  <arg name="is7dof"                 default="false"/>
+  <arg name="has2finger"             default="true"/>
+
 
   <group ns="$(arg robot_namespace)">
 
       <!-- Load the URDF into the ROS Parameter Server -->
       <param name="robot_description" command="$(find xacro)/xacro --inorder '$(arg robot_description_file)'" />
 
-      <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot based on description -->
-      <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-        args="-urdf -model $(arg robot_name) -param robot_description"/>
+      <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+      <!-- For 6-DOF -->
+      <group unless="$(arg is7dof)">
+        <!-- For 3 finger -->
+        <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" unless="$(arg has2finger)"
+          args="-urdf -model $(arg kinova_robotName) -param robot_description
+              -J $(arg kinova_robotType)_joint_1 0.0
+              -J $(arg kinova_robotType)_joint_2 2.9
+              -J $(arg kinova_robotType)_joint_3 1.3
+              -J $(arg kinova_robotType)_joint_4 -2.07
+              -J $(arg kinova_robotType)_joint_5 1.4
+              -J $(arg kinova_robotType)_joint_6 0.0
+              -J $(arg kinova_robotType)_joint_finger_1 1.0
+              -J $(arg kinova_robotType)_joint_finger_2 1.0
+              -J $(arg kinova_robotType)_joint_finger_3 1.0" />
 
-        <!-- This launches the joint states publisher and joint_state_controller for simulation -->
-        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
-          <remap from="/joint_states" to="$(arg robot_name)_driver/joint_states" />
-        </node>
+        <!-- For 2 finger -->
+        <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" if="$(arg has2finger)"
+          args="-urdf -model $(arg kinova_robotName) -param robot_description
+              -J $(arg kinova_robotType)_joint_1 0.0
+              -J $(arg kinova_robotType)_joint_2 2.9
+              -J $(arg kinova_robotType)_joint_3 1.3
+              -J $(arg kinova_robotType)_joint_4 -2.07
+              -J $(arg kinova_robotType)_joint_5 1.4
+              -J $(arg kinova_robotType)_joint_6 0.0
+              -J $(arg kinova_robotType)_joint_finger_1 1.0
+              -J $(arg kinova_robotType)_joint_finger_2 1.0" />
+      </group>
+      
+      <!-- For 7-DOF -->
+      <group if="$(arg is7dof)">
+        <!-- For 3 finger -->
+        <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" unless="$(arg has2finger)"
+          args="-urdf -model $(arg kinova_robotName) -param robot_description
+              -J $(arg kinova_robotType)_joint_1 0.0
+              -J $(arg kinova_robotType)_joint_2 2.9
+              -J $(arg kinova_robotType)_joint_3 0.0
+              -J $(arg kinova_robotType)_joint_4 1.3
+              -J $(arg kinova_robotType)_joint_5 -2.07
+              -J $(arg kinova_robotType)_joint_6 1.4
+              -J $(arg kinova_robotType)_joint_7 0.0
+              -J $(arg kinova_robotType)_joint_finger_1 1.0
+              -J $(arg kinova_robotType)_joint_finger_2 1.0
+              -J $(arg kinova_robotType)_joint_finger_3 1.0" />
 
-        <rosparam file="$(find chris_kinova_bringup)/param/$(arg robot_name)_joint_state_controllers.yaml"
-             ns="$(arg robot_name)_driver" command="load"/>
+        <!-- For 2 finger -->
+        <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" if="$(arg has2finger)"
+          args="-urdf -model $(arg kinova_robotName) -param robot_description
+              -J $(arg kinova_robotType)_joint_1 0.0
+              -J $(arg kinova_robotType)_joint_2 2.9
+              -J $(arg kinova_robotType)_joint_3 0.0
+              -J $(arg kinova_robotType)_joint_4 1.3
+              -J $(arg kinova_robotType)_joint_5 -2.07
+              -J $(arg kinova_robotType)_joint_6 1.4
+              -J $(arg kinova_robotType)_joint_7 0.0
+              -J $(arg kinova_robotType)_joint_finger_1 1.0
+              -J $(arg kinova_robotType)_joint_finger_2 1.0" />
+      </group>
 
-        <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-          output="screen" ns="$(arg robot_name)_driver"
-          args="joint_state_controller">
-        </node>
+      <!-- ros_control launch file -->
+      <include file="$(find kinova_control)/launch/kinova_control.launch">
+        <arg name="kinova_robotName" value="$(arg kinova_robotName)"/>
+        <arg name="kinova_robotType" value="$(arg kinova_robotType)"/>
+        <arg name="use_trajectory_controller" value="true"/>
+        <arg name="is7dof" value="$(arg is7dof)"/>
+        <arg name="has2finger" value="$(arg has2finger)"/>
+      </include>
 
   </group>
 

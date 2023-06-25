@@ -11,7 +11,7 @@
   <arg name="robot_description_file" default="$(find chris_kinova_bringup)/urdf/chris_kinova_lab.xacro" />
 
   <!-- Bring up the robot arm with description that includes sensor setup for our lab -->
-  <include file="$(find chris_kinova_bringup)/launch/chris_kinova_bringup.launch">
+  <include file="$(find chris_kinova_bringup)/launch/chris_kinova_robot_hardware.launch">
     <arg name="robot_namespace"        value="$(arg robot_namespace)"/>
     <arg name="base_prefix"            value="$(arg base_prefix)" />
     <arg name="kinova_robotType"       value="$(arg kinova_robotType)" />
