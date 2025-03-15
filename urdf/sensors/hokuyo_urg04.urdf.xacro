@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<!-- Hokoyu URG-04 lidar model (Simple) -->
+<robot name="hokuyo_urg04" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<xacro:macro name="hokuyo_urg04"
+        params="lidar_name lidar_type sim_gazebo:=^|false visualize_lidar:=^|true">
+
+  <!-- Constants for robot dimensions -->
+  <xacro:property name="PI" value="3.1415926535897931"/>
+  <xacro:property name="mass" value="0.25" /> <!-- kg -->
+  <xacro:property name="lx"   value="0.046"  /> <!-- size of lidar base -->
+  <xacro:property name="ly"   value="0.046"  /> <!-- size of lidar base -->
+  <xacro:property name="lz"   value="0.041"  /> <!-- size of lidar base -->
+  <xacro:property name="rhoz" value="0.020"  /> <!-- size of lidar base -->
+  <xacro:property name="hz"   value="0.029"  /> <!-- size of lidar base -->
+  <xacro:property name="mz"   value="0.0205" /> <!-- size of lidar base -->
+
+  <!-- Import Rviz colors -->
+  <xacro:include filename="$(find chris_kinova_bringup)/urdf/common_properties.urdf.xacro" />
+
+  <!-- Hokuyo Laser -->
+  <link name="${lidar_name}_base_link">
+    <collision name="${lidar_name}_base_link_collision">
+      <origin xyz="0 0 ${lz/2.0}" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.041 0.041 0.060"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0.0175" rpy="0 0 0"/>
+      <geometry>
+            <mesh filename="file://$(find chris_kinova_bringup)/meshes/sensors/hokuyo.dae"/>
+      </geometry>
+    </visual>
+
+    <inertial>
+      <mass value="${mass}" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <joint name="${lidar_name}_laser_joint" type="fixed">
+    <axis xyz="0 0 1" />
+    <origin xyz="0 0 ${lz/2+mz}" rpy="0 0 0"/>
+    <parent link="${lidar_name}_base_link"/>
+    <child link="${lidar_name}_laser"/>
+  </joint>
+
+  <!-- Hokuyo Laser -->
+  <link name="${lidar_name}_laser">
+    <collision name="${lidar_name}_laser_collision">
+      <origin xyz="0 0 ${-(hz-mz)}" rpy="0 0 0"/>
+      <geometry>
+            <cylinder radius="${rhoz}" length="${hz}" />
+      </geometry>
+    </collision>
+  </link>
+
+  <xacro:if value="${sim_gazebo}">
+    <!-- Simulation sensors -->
+    <gazebo reference="${lidar_name}_base_link">
+      <preserveFixedJoint>true</preserveFixedJoint>
+    </gazebo>
+    <gazebo reference="${lidar_name}_laser">
+      <preserveFixedJoint>true</preserveFixedJoint>
+    </gazebo>
+
+    <gazebo reference="${lidar_name}_laser">
+      <material>Gazebo/Grey</material>
+      <sensor name="${lidar_name}_sensor" type="${lidar_type}" >
+          <topic>${lidar_name}_node/scan_raw</topic>
+          <gz_frame_id>${lidar_name}_laser</gz_frame_id>
+          <pose>0 0 0 0 0 0</pose>
+          <visualize>${visualize_lidar}</visualize>
+          <update_rate>30</update_rate>
+          <always_on>1</always_on>
+          <ray>
+            <scan>
+              <horizontal>
+                <samples>682</samples>
+                <resolution>1</resolution>
+                <min_angle>-${PI*2.0/3.0}</min_angle>
+                <max_angle> ${PI*2.0/3.0}</max_angle>
+              </horizontal>
+            </scan>
+            <range>
+              <min>0.060</min>
+              <max>4.095</max>
+              <resolution>0.01</resolution>
+            </range>
+            <noise>
+              <type>gaussian</type>
+              <!-- Noise parameters based on published spec for Hokuyo laser
+                  achieving "+-30mm" accuracy at range < 10m.  A mean of 0.0m and
+                  stddev of 0.01m will put 99.7% of samples within 0.03m of the true
+                  reading. -->
+              <mean>0.0</mean>
+              <stddev>0.01</stddev>
+            </noise>
+          </ray>
+      </sensor>
+    </gazebo>
+  </xacro:if>
+
+</xacro:macro>
+
+</robot>

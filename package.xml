@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>chris_kinova_bringup</name>
+  <version>0.0.1</version>
+  <description>Launch scripts for gazebo and actual hardware</description>
+
+  <!-- One maintainer tag required, multiple allowed, one person per tag -->
+  <maintainer email="robotics@cnu.edu">David Conner</maintainer>
+  <author email="robotics@cnu.edu">David Conner</author>
+  <author>Kinova Support</author>
+
+
+  <!-- One license tag required, multiple allowed, one license per tag -->
+  <license>BSD</license>
+  <license>APACHE 2</license>
+
+  <!-- Url tags are optional, but mutiple are allowed, one per tag -->
+  <!-- Optional attribute type can be: website, bugtracker, or repository -->
+ <url type="website">https://github.com/CNURobotics/chris_kinova_bringup</url>
+
+  <!-- The *_depend tags are used to specify dependencies -->
+  <!-- Dependencies can be catkin packages or system dependencies -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>robot_state_publisher</depend>
+  <depend>tf2_ros</depend>
+  <depend>octomap</depend>
+
+  <exec_depend>moveit_msgs</exec_depend>
+  <exec_depend>moveit_planners_ompl</exec_depend>
+  <exec_depend>moveit_planners_chomp</exec_depend>
+  <exec_depend>moveit_planners_stomp</exec_depend>
+  <exec_depend>moveit_ros_planning_interface</exec_depend>
+  <exec_depend>moveit_ros_visualization</exec_depend>
+  <exec_depend>moveit_visual_tools</exec_depend>
+  <exec_depend>pilz_industrial_motion_planner</exec_depend>
+  <exec_depend>realsense2_description</exec_depend>
+  <exec_depend>controller_manager</exec_depend>
+  <exec_depend>ros2_control_test_assets</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+  <exec_depend>xacro</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+  <test_depend>ament_lint_auto</test_depend>
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+    <build_type>ament_cmake</build_type>
+    <gazebo_ros gazebo_model_path="${prefix}/.."/>
+
+  </export>
+</package>

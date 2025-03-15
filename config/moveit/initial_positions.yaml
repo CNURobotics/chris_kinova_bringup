@@ -1,0 +1,11 @@
+# Default initial positions for m1n6s200 ros2_control fake system
+
+initial_positions:
+  m1n6s200_joint_1 : 0
+  m1n6s200_joint_2 : 0.054
+  m1n6s200_joint_3 : 0.054
+  m1n6s200_joint_4 : 0
+  m1n6s200_joint_5 : 0
+  m1n6s200_joint_6 : 0
+  m1n6s200_joint_finger_1 : 0
+  m1n6s200_joint_finger_2 : 0

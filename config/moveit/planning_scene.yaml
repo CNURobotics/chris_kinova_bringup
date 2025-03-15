@@ -1,0 +1,38 @@
+# List of collision objects that are part of the planning scene
+collision_objects:
+  - id: "ground_plane"
+    frame_id: "world"
+    primitive_type: "BOX"
+    dimensions: [10.0, 10.0, 0.01]  # Width, Depth, Height
+    pose: [0.0, 0.0, -0.005, 0.0, 0.0, 0.0, 1.0]  # Position (XYZ) and Quaternion (WXYZ)
+
+  # - id: "table"
+  #   frame_id: "world"
+  #   primitive_type: "BOX"
+  #   dimensions: [1.0, 1.0, 0.75]  # Example table
+  #   pose: [0.5, 0.0, 0.375, 0.0, 0.0, 0.0, 1.0]  # Position (centered at 0.5m in X)
+
+# Define workspace constraints (optional)
+workspace:
+  min_x: -1.0
+  min_y: -1.0
+  min_z: 0.0
+  max_x: 1.0
+  max_y: 1.0
+  max_z: 2.0
+
+# Allowed Collision Matrix (ACM) settings
+allowed_collision_matrix:
+  - object_1: "ground_plane"
+    object_2: "m1n6s200_link_6"
+    allow: false
+
+# Default planning constraints (optional)
+constraints:
+  - name: "keep_above_ground"
+    position_constraints:
+      link_name: "m1n6s200_link_6"
+      region:
+        type: "BOX"
+        dimensions: [2.0, 2.0, 2.0]
+        pose: [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]

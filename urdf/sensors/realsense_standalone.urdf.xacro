@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!-- m1n6_2 refers to mico v1 6DOF non-spherical 2fingers -->
+
+
+<robot xmlns:xi="http://www.w3.org/2001/XInclude"
+  xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz"
+  xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model"
+  xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+  xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
+  xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom"
+  xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint"
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+  xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering"
+  xmlns:renderable="http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable"
+  xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics"
+  xmlns:xacro="http://www.ros.org/wiki/xacro" name="m1n6s200">
+
+  <xacro:arg name="use_nominal_extrinsics" default="true"/> <!-- required for gazebo -->
+  <xacro:arg name="add_camera_plug" default="false" />
+  <xacro:arg name="use_camera_mesh" default="true" />
+
+  <xacro:include filename="$(find chris_kinova_bringup)/urdf/common_properties.urdf.xacro" />
+
+  <xacro:include filename="$(find chris_kinova_bringup)/urdf/sensors/realsense_sensor.urdf.xacro"/>
+
+  <link name="world"/>
+
+  <joint name="realsense_tripod_joint" type="fixed">
+    <origin xyz="0.0 0.25 0.12" rpy="0 -0.05 -0.174533"/>
+    <parent link="world"/>
+    <child link="realsense_tripod_link"/>
+  </joint>
+  <link name="realsense_tripod_link">
+    <visual>
+      <origin xyz="0 0 -0.06" rpy="0 0 0" />
+      <geometry>
+        <box size="0.02 0.02 0.12"/>
+      </geometry>
+      <material name="tripod">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <inertial>
+        <mass value="0.0266" />
+        <origin xyz="0 0 0"/>
+        <inertia ixx="1.e-4" ixy="0.0" ixz="0.0"
+                 iyy="1.e-4" iyz="0.0"
+                 izz="1.e-5" />
+    </inertial>
+
+    <collision>
+      <origin xyz="0 0 -0.06" rpy="0 0 0" />
+      <geometry>
+        <box size="0.02 0.02 0.11"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <xacro:realsense_sensor parent="realsense_tripod_link"
+      use_nominal_extrinsics="$(arg use_nominal_extrinsics)"
+      add_plug="$(arg add_camera_plug)"
+      use_mesh="$(arg use_camera_mesh)"
+      sim_gazebo="true"/> <!-- used for Gazebo debugging -->
+
+</robot>

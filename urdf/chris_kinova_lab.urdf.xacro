@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+<!-- m1n6_2 refers to mico v1 6DOF non-spherical 2fingers -->
+
+
+<robot xmlns:xi="http://www.w3.org/2001/XInclude"
+  xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz"
+  xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model"
+  xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+  xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
+  xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom"
+  xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint"
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+  xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering"
+  xmlns:renderable="http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable"
+  xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics"
+  xmlns:xacro="http://www.ros.org/wiki/xacro" name="m1n6s200">
+
+  <xacro:arg name="prefix" default="m1n6s200" />
+  <xacro:arg name="use_mock_hardware" default="false" />
+  <xacro:arg name="mock_sensor_commands" default="false" />
+  <xacro:arg name="sim_gazebo" default="false" />
+  <xacro:arg name="use_nominal_extrinsics" default="true"/> <!-- required for gazebo -->
+  <xacro:arg name="add_camera_plug" default="false" />
+  <xacro:arg name="use_camera_mesh" default="true" />
+  <xacro:arg name="lidar_type" default="gpu_lidar" /> <!-- vs. lidar -->
+  <xacro:arg name="visualize_lidar" default="true" />
+  <xacro:arg name="no_sensors" default="false" /> <!-- don't include the hokoyu and realsense -->
+
+  <xacro:include filename="$(find chris_kinova_bringup)/urdf/common_properties.urdf.xacro" />
+
+  <xacro:include filename="$(find chris_kinova_bringup)/urdf/m1n6s200.urdf.xacro"/>
+
+  <link name="base_plate">
+    <visual>
+      <origin xyz="0 0 -0.009525" rpy="0 0 0" />
+      <geometry>
+        <box size = "0.4064 0.762 0.01905"/>
+      </geometry>
+      <material name="Wood">
+            <color rgba="0.8 0.6 0.4 1.0"/>
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 -0.009525" rpy="0 0 0" />
+      <geometry>
+        <box size = "0.4064 0.762 0.01905"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="kinova_mount_base">
+    <visual>
+      <origin xyz="0 0 0.009525" rpy="0 0 0" />
+      <geometry>
+        <box size = "0.1461 0.1981 0.01905"/>
+      </geometry>
+      <material name="DarkGrey">
+            <color rgba="0.1 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.009525" rpy="0 0 0" />
+      <geometry>
+        <box size = "0.1461 0.1981 0.01905"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="kinova_root">
+    <visual>
+      <origin xyz="0 0 -0.0104" rpy="0 0 0" />
+      <geometry>
+        <box size = "0.03 0.03 0.0608"/>
+      </geometry>
+      <material name="DarkGrey">
+            <color rgba="0.005 0.005 0.02 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.0104" rpy="0 0 0" />
+      <geometry>
+        <box size = "0.03 0.03 0.0608"/>
+      </geometry>
+      <!-- material name="material_dark_grey" /-->
+    </collision>
+
+  </link>
+
+  <!-- for gazebo -->
+  <link name="world"/>
+
+  <joint name="connect_base_plate_and_world" type="fixed">
+    <parent link="world" />
+    <child link="base_plate" />
+    <origin xyz="0 0 0.01905" rpy="0 0 0" /> <!-- origin of base plate at top -->
+  </joint>
+
+  <joint name="connect_base_and_mount_plate" type="fixed">
+    <parent link="base_plate" />
+    <child link="kinova_mount_base" />
+    <origin xyz="0 0 0.0" rpy="0 0 0" />
+  </joint>
+
+  <joint name="connect_base_and_mount_post" type="fixed">
+    <parent link="base_plate" />
+    <child link="kinova_root" />
+    <origin xyz="0 0 0.036" rpy="0 0 ${M_PI/2}" />
+  </joint>
+
+  <xacro:property name="robot_root" value="kinova_root" />
+
+  <xacro:m1n6s200  base_parent="${robot_root}"
+    use_mock_hardware="$(arg use_mock_hardware)"
+    mock_sensor_commands="$(arg mock_sensor_commands)"
+    sim_gazebo="$(arg sim_gazebo)"
+    prefix="$(arg prefix)" />
+
+  <xacro:unless value="$(arg no_sensors)">
+      <xacro:include filename="$(find chris_kinova_bringup)/urdf/sensors/realsense_sensor.urdf.xacro"/>
+
+      <xacro:include filename="$(find chris_kinova_bringup)/urdf/sensors/hokuyo_urg04.urdf.xacro"/>
+
+      <joint name="realsense_tripod_joint" type="fixed">
+        <origin xyz="0.0 0.25 0.12" rpy="0 -0.05 -0.174533"/>
+        <parent link="base_plate"/>
+        <child link="realsense_tripod_link"/>
+      </joint>
+      <link name="realsense_tripod_link">
+        <visual>
+          <origin xyz="0 0 -0.06" rpy="0 0 0" />
+          <geometry>
+            <box size="0.02 0.02 0.12"/>
+          </geometry>
+          <material name="tripod">
+            <color rgba="0.5 0.5 0.5 1"/>
+          </material>
+        </visual>
+        <inertial>
+            <mass value="0.0266" />
+            <origin xyz="0 0 0"/>
+            <inertia ixx="1.e-4" ixy="0.0" ixz="0.0"
+                     iyy="1.e-4" iyz="0.0"
+                     izz="1.e-5" />
+        </inertial>
+        <collision>
+          <origin xyz="0 0 -0.06" rpy="0 0 0" />
+          <geometry>
+            <box size="0.02 0.02 0.11"/>
+          </geometry>
+        </collision>
+      </link>
+
+      <xacro:realsense_sensor parent="realsense_tripod_link"
+          use_nominal_extrinsics="$(arg use_nominal_extrinsics)"
+          add_plug="$(arg add_camera_plug)"
+          use_mesh="$(arg use_camera_mesh)"
+          sim_gazebo="$(arg sim_gazebo)"/>
+
+      <joint name="hokuyo_base_joint" type="fixed">
+        <axis xyz="0 0 1" />
+        <origin xyz="0.105 0.0 0.019" rpy="0 0 0"/>
+        <parent link="base_plate"/>
+        <child link="hokuyo_base_link"/>
+      </joint>
+      <xacro:hokuyo_urg04
+          lidar_name="hokuyo"
+          lidar_type="$(arg lidar_type)"
+          sim_gazebo="$(arg sim_gazebo)"
+          visualize_lidar="$(arg visualize_lidar)"/>
+  </xacro:unless>
+
+</robot>
