@@ -1,0 +1,335 @@
+#!/usr/bin/python3
+
+from math import pi
+from PyQt5.QtWidgets import QApplication, QFrame, QLabel, QProgressBar, QPushButton, QSlider, QHBoxLayout, QVBoxLayout, QWidget
+from PyQt5.QtCore import Qt, QTimer
+import threading
+
+import rclpy
+from rclpy.node import Node
+from control_msgs.action import FollowJointTrajectory
+from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+from rclpy.action import ActionClient
+from builtin_interfaces.msg import Duration
+from control_msgs.msg import JointTolerance
+from sensor_msgs.msg import JointState
+import yaml
+from rosidl_runtime_py import message_to_ordereddict
+
+joint_positiion_limits = [(-2*pi, 2*pi), ((50/180)*pi, (310/180)*pi), ((35/180)*pi, (325/180)*pi),
+                          (-2*pi, 2*pi), (-2*pi, 2*pi), (-2*pi, 2*pi)]
+
+joint_vel_limits = [(36*pi/180), (36*pi/180), (36*pi/180), (48*pi/180), (48*pi/180), (48*pi/180)]
+NUM_JOINTS = 6
+
+class TrajectoryGUI(Node):
+    def __init__(self):
+        super().__init__('slider_gui')
+        self.client = ActionClient(self, FollowJointTrajectory, '/mico_arm_controller/follow_joint_trajectory')
+        self.prior_pos_cmd = None
+        self.current_goal_handle = None
+        self.max_time = 0.0
+        self.print_msg = True
+        self.status_label = None  # to be set from GUI
+
+        for i in range(NUM_JOINTS):
+            diff = joint_positiion_limits[i][1] - joint_positiion_limits[i][0]
+            dt = diff / joint_vel_limits[i]
+            if dt > self.max_time:
+                self.max_time = dt
+
+        self.expected_joint_names = [f'm1n6s200_joint_{i+1}' for i in range(NUM_JOINTS)]
+        self.get_logger().info(f" Initialize TrajectoryGUI:  max duration = {self.max_time} s")
+
+        self.current_joint_states = None
+        self.joint_state_sub = self.create_subscription(
+            JointState,
+            '/m1n6s200/joint_states',
+            self.joint_state_callback,
+            10
+        )
+
+        self.sliders = []  # Will be filled in GUI
+        self.joint_position_indicators = []
+        self.send_button = None
+        self.reset_button = None
+        self.cancel_button = None 
+
+        self.name_to_pos = {}
+        self.timer = None
+
+    def joint_state_callback(self, msg):
+        # Filter only the joints we care about (optional)
+
+        if self.sliders is None:
+            return
+
+        # Joint state does not always include every joint and order varies
+        self.name_to_pos.update(dict(zip(msg.name, msg.position)))
+
+        try:
+            current_joint_states = [self.name_to_pos[name] for name in self.expected_joint_names]
+            if self.current_joint_states is None:
+                prior_pos_cmd = [int(pos*100) for pos in current_joint_states]
+                self.get_logger().info("Initialize the slider positions ...")
+                for jnt, slider in enumerate(self.sliders):
+                    slider.blockSignals(True)  # prevent triggering signals
+                    slider.setValue(int(prior_pos_cmd[jnt]))
+                    slider.blockSignals(False)
+                self.prior_pos_cmd = prior_pos_cmd
+                print(f"reset: positions={prior_pos_cmd}", flush=True)
+            self.current_joint_states = current_joint_states
+        except Exception as exc:
+            print(f"Failed to update all joints: {exc}")
+
+    def update_joint_positions(self):
+        if self.current_joint_states is not None:
+            for i, val in enumerate(self.current_joint_states):
+                bar = self.joint_position_indicators[i]
+                current_val = bar.value()
+                new_value = int(val*100)
+                if abs(current_val - new_value) > 1:
+                    bar.setValue(new_value)
+                    bar.setFormat(f"{val:.2f} rad")
+
+    def reset_sliders(self):
+        self.current_joint_states = None # Block updates and force reset
+        self.prior_pos_cmd = None
+        self.get_logger().info(f"Force reset of sliders on next joint states message")
+
+    def on_cancel_done_callback(self, future):
+        result = future.result()
+        self.get_logger().info(f"Canceled with {result}")
+        self.current_goal_handle = None
+        self.update_status("Canceled")
+
+    def cancel_action(self):
+        if self.current_goal_handle is not None:
+            cancel_future = self.current_goal_handle.cancel_goal_async()
+            cancel_future.add_done_callback(self.on_cancel_done_callback)
+            self.get_logger().info("Canceling active goal ...")
+            self.update_status("Canceling ...")
+
+    def update_status(self, text):
+        if self.status_label is not None:
+            self.status_label.setText(f"Status: {text}")
+
+    def goal_done_callback(self, future):
+        result = future.result().result
+        self.get_logger().info(f"Trajectory finished with status: {result}")
+        self.update_status("Goal finished.")
+        self.current_goal_handle = None
+
+    def goal_response_callback(self, future):
+        goal_handle = future.result()
+        if not goal_handle.accepted:
+            self.get_logger().warn("Goal was rejected by the action server.")
+            self.update_status("Goal rejected.")
+            self.current_goal_handle = None
+            return
+
+        self.current_goal_handle = goal_handle
+        self.get_logger().info("Goal accepted. Waiting for result...")
+        self.update_status("Goal accepted.")
+        result_future = goal_handle.get_result_async()
+        result_future.add_done_callback(self.goal_done_callback)
+
+    def send_joint_positions(self):
+        if not self.client.wait_for_server(timeout_sec=0.05):
+            if self.print_msg:
+                self.get_logger().error('Action server not available: /mico_arm_controller/follow_joint_trajectory')
+            self.print_msg  = not self.print_msg
+            return
+
+        if self.current_joint_states is None or self.prior_pos_cmd is None:
+            if self.print_msg:
+                self.get_logger().error('still waiting on current joint states')
+            self.print_msg  = not self.print_msg
+            return
+
+        if self.current_goal_handle is not None:
+            # Still waiting on previous goal
+            # if self.print_msg:
+            #     self.get_logger().error('still waiting on prior action')
+            # self.print_msg  = not self.print_msg
+            return
+
+        positions = [slider.value() for slider in self.sliders]
+        if positions == self.prior_pos_cmd:
+            # if self.print_msg:
+            #     self.get_logger().error('No change in command')
+            # self.print_msg  = not self.print_msg
+            return
+
+        diff = 0
+        for jnt, pos in enumerate(positions):
+            diff += abs(pos - self.prior_pos_cmd[jnt])
+        if diff < 2:
+            self.get_logger().error('Too small of a change in command')
+            return
+
+        goal_msg = FollowJointTrajectory.Goal()
+        traj = JointTrajectory()
+        traj.joint_names = self.expected_joint_names[:]
+
+        point0 = JointTrajectoryPoint()
+        point0.positions = [pos for pos in self.current_joint_states]
+        print(f"p0: {point0.positions}", flush=True)
+
+        point1 = JointTrajectoryPoint()
+        point1.positions = [pos/100.0 for pos in positions]
+        print(f"p1: {point1.positions}", flush=True)
+
+        duration = 0.0
+        if self.prior_pos_cmd is not None:
+            for i in range(NUM_JOINTS):
+                diff = abs(point1.positions[i] - point0.positions[i])
+                dt = diff / joint_vel_limits[i]
+                if dt > duration:
+                    duration = dt
+        if duration < 2.0:
+            # Allow at least 2 seconds
+            duration = 2.0
+        else:
+            duration *= 1.5  # Do not run at the limits
+
+        sec = int(duration)
+        nanosec = int((duration - sec) * 1e9)
+        point1.time_from_start = Duration(sec=sec, nanosec=nanosec)
+        traj.points = [point0, point1]
+        goal_msg.trajectory = traj
+
+        self.prior_pos_cmd = positions
+
+
+        tolerances = []
+        for name in traj.joint_names:
+            tol = JointTolerance()
+            tol.name = name
+            tol.position = 0.5  # radians
+            tol.velocity = 5.0  # rad/s
+            tol.acceleration = 2.0  # rad/s^2
+            tolerances.append(tol)
+
+        goal_msg.path_tolerance = tolerances
+        goal_msg.goal_time_tolerance = Duration(sec=2)
+
+        self.update_status("Sending goal...")
+        msg_dict = message_to_ordereddict(goal_msg)
+        yaml_str = yaml.dump(msg_dict, sort_keys=False)
+        #self.get_logger().info(f"Sending {yaml_str} trajectory ...")
+        self.get_logger().info(f"send: target position={point1.positions} @ {duration} ({point1.time_from_start})")
+
+        send_future = self.client.send_goal_async(goal_msg)
+        send_future.add_done_callback(self.goal_response_callback)
+
+def create_gui(node):
+    app = QApplication([])
+    window = QWidget()
+    layout = QVBoxLayout()
+
+    # --------------
+    status_layout = QHBoxLayout()
+    status_label = QLabel("Status: Idle")
+    status_layout.addWidget(status_label)
+    node.status_label = status_label
+
+    send_button = QPushButton("Send Trajectory")
+    status_layout.addWidget(send_button)
+    send_button.clicked.connect(node.send_joint_positions)
+    send_button.setStyleSheet('background-color: lightgreen')
+
+    cancel_button = QPushButton("Cancel Action")
+    status_layout.addWidget(cancel_button)
+    cancel_button.clicked.connect(node.cancel_action)
+    cancel_button.setStyleSheet('background-color: red')
+
+    reset_button = QPushButton("Reset Sliders")
+    status_layout.addWidget(reset_button)
+    reset_button.clicked.connect(node.reset_sliders)
+    reset_button.setStyleSheet('background-color: orange')
+
+    layout.addLayout(status_layout)
+    node.send_button = send_button
+    node.cancel_button = cancel_button 
+    node.reset_button = reset_button
+
+    # ----------------------------
+
+    line = QFrame()
+    line.setFrameShape(QFrame.HLine)
+    line.setFrameShadow(QFrame.Sunken)
+    layout.addWidget(line)
+    sliders = []
+    for i in range(6):
+        joint_name = f'm1n6s200_joint_{i+1}'
+
+        label = QLabel(joint_name)
+        layout.addWidget(label)
+
+        # Position indicator bar (shows actual joint position)
+        bar = QProgressBar()
+        bar.setMinimum(int(joint_positiion_limits[i][0] * 100))
+        bar.setMaximum(int(joint_positiion_limits[i][1] * 100))
+        bar.setFormat("%.2f rad" % 0.0)  # default text
+        bar.setTextVisible(True)
+        layout.addWidget(bar)
+        node.joint_position_indicators.append(bar)
+
+        slider = QSlider(Qt.Horizontal)
+        slider.setMinimum(int(joint_positiion_limits[i][0]*100))
+        slider.setMaximum(int(joint_positiion_limits[i][1]*100))
+        slider.setValue(0)
+        layout.addWidget(slider)
+        node.sliders.append(slider)
+
+    ## Create timer after sliders are defined
+    node.create_timer(0.05, node.update_joint_positions)  # 20 hz
+
+    window.setLayout(layout)
+    window.setWindowTitle('Joint Controller')
+    window.resize(600, 400)
+    window.show()
+
+    # Add a timer that checks for shutdown every 100ms
+    def check_shutdown():
+        try:
+            if not rclpy.ok():
+                app.quit()
+        except:
+            pass
+
+    shutdown_timer = QTimer()
+    shutdown_timer.timeout.connect(check_shutdown)
+    shutdown_timer.start(250)  # check every 1/4 second
+    window.closeEvent = lambda event: rclpy.shutdown()
+    try:
+        app.exec()
+    except Exception as exc:
+        print(exc)
+
+
+def spinner(node):
+    try:
+        rclpy.spin(node)
+    except:
+        print("Spinning stopped")
+
+rclpy.init()
+node = TrajectoryGUI()
+
+spin_thread = threading.Thread(target=rclpy.spin, args=(node,), daemon=True)
+spin_thread.start()
+
+create_gui(node)
+print(f"Finished GUI ...", flush=True)
+try:
+    node.destroy_node()
+    if rclpy.ok():
+        print("Shutting down rclpy ...", flush=True)
+        rclpy.shutdown()
+except:
+    pass
+finally:
+    print("Shutdown complete ...", flush=True)
+

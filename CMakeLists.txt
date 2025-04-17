@@ -15,6 +15,7 @@ install(DIRECTORY config launch meshes urdf
 install(PROGRAMS
   scripts/duckie
   scripts/kinova_controller_monitor
+  scripts/kinova_joint_control_gui
   scripts/live_gripper.py
   scripts/live_plot_arm
   scripts/live_plot_gripper
