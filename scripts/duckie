@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+
+# OK, I don't have a rubber duckie, so here is a yellow ball
+gz service -s /world/empty/create \
+  --reqtype gz.msgs.EntityFactory \
+  --reptype gz.msgs.Boolean \
+  --timeout 1000 \
+  --req 'sdf: " <sdf version=\"1.9\">   <model name=\"yellow_sphere\">     <static>false</static>     <link name=\"link\">       <visual name=\"visual\">         <geometry>           <sphere><radius>0.0254</radius></sphere>         </geometry>         <material>           <ambient>1 1 0 1</ambient>           <diffuse>1 1 0 1</diffuse>         </material>       </visual>       <collision name=\"collision\">         <geometry>           <sphere><radius>0.254</radius></sphere>         </geometry>       </collision>     </link>   </model> </sdf> ", name: "yellow_sphere", pose: {   position: {x: 0.5, y: 0.2, z: 0.2} } '

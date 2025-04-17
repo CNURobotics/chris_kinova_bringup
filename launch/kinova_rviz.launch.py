@@ -16,9 +16,7 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 import launch
-import launch.events
 from launch_ros.actions import Node
-import xacro
 
 
 def generate_launch_description():
@@ -26,8 +24,6 @@ def generate_launch_description():
     rviz_config_dir = os.path.join(get_package_share_directory('chris_kinova_bringup'), 'config', 'model_view.rviz')
     xacro_path = os.path.join(get_package_share_directory('chris_kinova_bringup'), 'urdf', 'chris_kinova_lab.urdf.xacro')
     print(f"xacro path = '{xacro_path}'")
-    robot_description = xacro.process_file(xacro_path, mappings={'use_nominal_extrinsics': 'true', 'add_plug': 'true'}).toprettyxml(indent='  ')
-    #print(robot_description)
 
     rviz_node = Node(
         package='rviz2',

@@ -12,5 +12,15 @@ install(DIRECTORY config launch meshes urdf
         DESTINATION share/${PROJECT_NAME}
 )
 
+install(PROGRAMS
+  scripts/duckie
+  scripts/kinova_controller_monitor
+  scripts/live_gripper.py
+  scripts/live_plot_arm
+  scripts/live_plot_gripper
+  scripts/live_plot.py
+  scripts/plot_kinova_controller_log
+  DESTINATION lib/${PROJECT_NAME}
+)
 ament_package()
 

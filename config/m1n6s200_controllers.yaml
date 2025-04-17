@@ -22,41 +22,111 @@ mico_arm_controller:
       - m1n6s200_joint_5
       - m1n6s200_joint_6
     command_interfaces:
-      - position
       - velocity
     state_interfaces:
       - position
       - velocity
-
+    allowed_execution_duration_scaling: 1.2
+    allowed_goal_duration_margin: 1.0
+    allowed_start_tolerance: 0.02
+    execution_duration_monitoring: false
+    gains:
+          m1n6s200_joint_1:
+            p: 9.0
+            i: 0.09
+            d: 0.01
+            i_clamp: 0.35
+            angle_wraparound: true  # Use smallest error
+          m1n6s200_joint_2:
+            p: 9.0
+            i: 0.09
+            d: 0.01
+            i_clamp: 0.35
+            angle_wraparound: true  # Use smallest error
+          m1n6s200_joint_3:
+            p: 9.0
+            i: 0.09
+            d: 0.01
+            i_clamp: 0.35
+            angle_wraparound: true  # Use smallest error
+          m1n6s200_joint_4:
+            p: 7.0
+            i: 0.07
+            d: 0.01
+            i_clamp: 1.0
+            angle_wraparound: true  # Use smallest error
+          m1n6s200_joint_5:
+            p: 7.0
+            i: 0.07
+            d: 0.01
+            i_clamp: 1.0
+            angle_wraparound: true  # Use smallest error
+          m1n6s200_joint_6:
+            p: 7.0
+            i: 0.07
+            d: 0.01
+            i_clamp: 1.0
+            angle_wraparound: true  # Use smallest error
+    velocity_ff:
+        m1n6s200_joint_1: 1.0
+        m1n6s200_joint_2: 1.0
+        m1n6s200_joint_3: 1.0
+        m1n6s200_joint_4: 1.0
+        m1n6s200_joint_5: 1.0
+        m1n6s200_joint_6: 1.0
+    constraints:
+      goal_time: 1.0  # seconds allowed after trajectory end time
+      stopped_velocity_tolerance: 0.03  # how slow must joints be at end
+      m1n6s200_joint_1:
+        goal: 0.0025     # final position tolerance in radians
+        trajectory: 0.1  # maximum deviation during execution
+      m1n6s200_joint_2:
+        goal: 0.0025
+        trajectory: 0.1
+      m1n6s200_joint_3:
+        goal: 0.0025
+        trajectory: 0.1
+      m1n6s200_joint_4:
+        goal: 0.0025
+        trajectory: 0.1
+      m1n6s200_joint_5:
+        goal: 0.0025
+        trajectory: 0.1
+      m1n6s200_joint_6:
+        goal: 0.0025
+        trajectory: 0.1
 
 mico_finger_controller:
   ros__parameters:
     joints:
       - m1n6s200_joint_finger_1
       - m1n6s200_joint_finger_2
+    interface_name: velocity
     command_interfaces:
-      - position
       - velocity
     state_interfaces:
       - position
       - velocity
-
-# controller_list:
-#   - name: m1n6s200
-#     action_ns: follow_joint_trajectory
-#     type: FollowJointTrajectory
-#     default: true
-#     joints:
-#       - m1n6s200_joint_1
-#       - m1n6s200_joint_2
-#       - m1n6s200_joint_3
-#       - m1n6s200_joint_4
-#       - m1n6s200_joint_5
-#       - m1n6s200_joint_6
-#   - name: m1n6s200_gripper
-#     action_ns: gripper_command
-#     type: GripperCommand
-#     default: true
-#     joints:
-#       - m1n6s200_joint_finger_1
-#       - m1n6s200_joint_finger_2
+    gains:
+          m1n6s200_joint_finger_1:
+            p: 7.0
+            i: 0.0
+            d: 0.01
+            i_clamp: 1.0
+          m1n6s200_joint_finger_2:
+            p: 7.0
+            i: 0.0
+            d: 0.01
+            i_clamp: 1.0
+    velocity_ff:
+        m1n6s200_joint_finger_1: 1.0
+        m1n6s200_joint_finger_2: 1.0
+    constraints:
+      goal_time: 1.0  # seconds allowed after trajectory end time
+      stopped_velocity_tolerance: 0.005  # how slow must joints be at end
+      m1n6s200_joint_finger_1:
+        goal: 0.01       # final position tolerance in radians
+        trajectory: 0.2  # maximum deviation during execution
+      m1n6s200_joint_finger_2:
+        goal: 0.01
+        trajectory: 0.2

@@ -26,7 +26,7 @@ from launch_ros.substitutions import FindPackageShare
 from launch.conditions import IfCondition
 
 
-def generate_launch_description():
+def generate_launch_description(kinova_arm_name='m1n6s200'):
     # Declare arguments
     declared_arguments = []
     declared_arguments.append(
@@ -83,7 +83,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             "mock_sensor_commands",
-            default_value="false",
+            default_value="true",
             description="Enable mock command interfaces for sensors used for simple simulations. \
             Used only if 'use_mock_hardware' parameter is true.",
         )
@@ -135,7 +135,7 @@ def generate_launch_description():
     )
     default_arguments.append(
         LogInfo(
-            msg=PythonExpression(['"Using default controllers_file: ', LaunchConfiguration("kinova_arm"), '_controllers.yaml"']),
+            msg=PythonExpression(['"Using default controllers_file: ', LaunchConfiguration("kinova_arm"), '_mock_controllers.yaml"']),
             condition=IfCondition(
                 EqualsSubstitution(LaunchConfiguration("controllers_file"), "None")
             )
@@ -144,7 +144,7 @@ def generate_launch_description():
     default_arguments.append(
         SetLaunchConfiguration(
             name="controllers_file",
-            value=PythonExpression(['"', LaunchConfiguration("kinova_arm"), '_controllers.yaml"']),
+            value=PythonExpression(['"', LaunchConfiguration("kinova_arm"), '_mock_controllers.yaml"']),
             condition=IfCondition(
                 EqualsSubstitution(LaunchConfiguration("controllers_file"), "None")
             )
@@ -178,6 +178,7 @@ def generate_launch_description():
     use_mock_hardware = LaunchConfiguration("use_mock_hardware")
     mock_sensor_commands = LaunchConfiguration("mock_sensor_commands")
     robot_controller = LaunchConfiguration("robot_controller")
+    finger_controller = LaunchConfiguration("finger_controller")
 
     # Get URDF via xacro
     robot_description_content = Command(
@@ -191,14 +192,10 @@ def generate_launch_description():
                 [FindPackageShare("chris_kinova_bringup"), "urdf", "chris_kinova_lab.urdf.xacro"]  # include base frame
             ),
             " ",
-            #"prefix:=",
-            #prefix,
-            " ",
-            "use_mock_hardware:=",
-            use_mock_hardware,
-            " ",
-            "mock_sensor_commands:=",
-            mock_sensor_commands,
+            f"prefix:={kinova_arm_name} ",
+            "use_mock_hardware:=true ",
+            "mock_sensor_commands:=true ",
+            "sim_gazebo:=false ",
             " ",
         ]
     )
@@ -222,7 +219,8 @@ def generate_launch_description():
         package="robot_state_publisher",
         executable="robot_state_publisher",
         output="both",
-        parameters=[robot_description],
+        parameters=[robot_description, {"use_sim_time": False}],
+        remappings=[('/joint_states', f'/{kinova_arm_name}/joint_states')],
     )
     rviz_node = Node(
         condition=IfCondition(LaunchConfiguration("use_rviz")),
@@ -236,10 +234,15 @@ def generate_launch_description():
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager",
+                   # Below is one string!
+                   f"--controller-ros-args=--ros-args "
+                   f"--remap /joint_states:=/{kinova_arm_name}/joint_states "
+                   f"--remap /dynamic_joint_states:=/{kinova_arm_name}/dynamic_joint_states",
+        ],
     )
 
-    robot_controller_names = [robot_controller]
+    robot_controller_names = [robot_controller, finger_controller]
     robot_controller_spawners = []
     for controller in robot_controller_names:
         robot_controller_spawners += [

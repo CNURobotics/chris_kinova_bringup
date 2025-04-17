@@ -1,0 +1,3 @@
+#!/bin/bash
+SCRIPT_DIR=$(dirname "$(realpath "$0")")
+$WORKSPACE_ROOT/venv/bin/bokeh serve --show "$SCRIPT_DIR/live_plot.py"

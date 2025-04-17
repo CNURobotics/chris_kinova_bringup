@@ -5,7 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
-        - /MotionPlanning1
+        - /TF1/Frames1
       Splitter Ratio: 0.5
     Tree Height: 160
   - Class: rviz_common/Help
@@ -36,7 +36,7 @@ Visualization Manager:
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
       Value: true
-    - Acceleration_Scaling_Factor: 1.0
+    - Acceleration_Scaling_Factor: 1
       Class: moveit_rviz_plugin/MotionPlanning
       Enabled: true
       Move Group Namespace: ""
@@ -72,6 +72,18 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          camera_bottom_screw_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_color_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_color_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           camera_depth_frame:
             Alpha: 1
             Show Axes: false
@@ -80,19 +92,27 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          camera_infra1_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_infra1_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_infra2_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_infra2_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           camera_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          camera_rgb_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          camera_rgb_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           hokuyo_base_link:
             Alpha: 1
             Show Axes: false
@@ -104,6 +124,11 @@ Visualization Manager:
             Show Trail: false
             Value: true
           kinova_mount_base:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          kinova_root:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -167,7 +192,7 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          root:
+          realsense_tripod_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -176,7 +201,7 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-        Loop Animation: true
+        Loop Animation: false
         Robot Alpha: 0.5
         Robot Color: 150; 50; 150
         Show Robot Collision: false
@@ -227,6 +252,18 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          camera_bottom_screw_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_color_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_color_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           camera_depth_frame:
             Alpha: 1
             Show Axes: false
@@ -235,19 +272,27 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          camera_infra1_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_infra1_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_infra2_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_infra2_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           camera_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          camera_rgb_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          camera_rgb_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           hokuyo_base_link:
             Alpha: 1
             Show Axes: false
@@ -259,6 +304,11 @@ Visualization Manager:
             Show Trail: false
             Value: true
           kinova_mount_base:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          kinova_root:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -322,7 +372,7 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          root:
+          realsense_tripod_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -335,7 +385,118 @@ Visualization Manager:
         Show Robot Collision: false
         Show Robot Visual: true
       Value: true
-      Velocity_Scaling_Factor: 1.0
+      Velocity_Scaling_Factor: 1
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Filter (blacklist): ""
+      Filter (whitelist): ""
+      Frame Timeout: 15
+      Frames:
+        All Enabled: false
+        base_plate:
+          Value: true
+        camera_bottom_screw_frame:
+          Value: false
+        camera_color_frame:
+          Value: false
+        camera_color_optical_frame:
+          Value: true
+        camera_depth_frame:
+          Value: false
+        camera_depth_optical_frame:
+          Value: false
+        camera_infra1_frame:
+          Value: false
+        camera_infra1_optical_frame:
+          Value: false
+        camera_infra2_frame:
+          Value: false
+        camera_infra2_optical_frame:
+          Value: false
+        camera_link:
+          Value: false
+        hokuyo_base_link:
+          Value: false
+        hokuyo_laser:
+          Value: true
+        kinova_mount_base:
+          Value: true
+        kinova_root:
+          Value: true
+        m1n6s200_end_effector:
+          Value: true
+        m1n6s200_link_1:
+          Value: true
+        m1n6s200_link_2:
+          Value: true
+        m1n6s200_link_3:
+          Value: true
+        m1n6s200_link_4:
+          Value: true
+        m1n6s200_link_5:
+          Value: true
+        m1n6s200_link_6:
+          Value: true
+        m1n6s200_link_base:
+          Value: true
+        m1n6s200_link_finger_1:
+          Value: false
+        m1n6s200_link_finger_2:
+          Value: false
+        m1n6s200_link_finger_tip_1:
+          Value: true
+        m1n6s200_link_finger_tip_2:
+          Value: true
+        realsense_tripod_link:
+          Value: false
+        world:
+          Value: true
+      Marker Scale: 0.20000000298023224
+      Name: TF
+      Show Arrows: false
+      Show Axes: true
+      Show Names: false
+      Tree:
+        world:
+          base_plate:
+            hokuyo_base_link:
+              hokuyo_laser:
+                {}
+            kinova_mount_base:
+              {}
+            kinova_root:
+              m1n6s200_link_base:
+                m1n6s200_link_1:
+                  m1n6s200_link_2:
+                    m1n6s200_link_3:
+                      m1n6s200_link_4:
+                        m1n6s200_link_5:
+                          m1n6s200_link_6:
+                            m1n6s200_end_effector:
+                              {}
+                            m1n6s200_link_finger_1:
+                              m1n6s200_link_finger_tip_1:
+                                {}
+                            m1n6s200_link_finger_2:
+                              m1n6s200_link_finger_tip_2:
+                                {}
+            realsense_tripod_link:
+              camera_bottom_screw_frame:
+                camera_link:
+                  camera_color_frame:
+                    camera_color_optical_frame:
+                      {}
+                  camera_depth_frame:
+                    camera_depth_optical_frame:
+                      {}
+                  camera_infra1_frame:
+                    camera_infra1_optical_frame:
+                      {}
+                  camera_infra2_frame:
+                    camera_infra2_optical_frame:
+                      {}
+      Update Interval: 0
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -354,7 +515,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 2
+      Distance: 4.310067653656006
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -369,10 +530,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5
+      Pitch: 0.28000062704086304
       Target Frame: base_link
       Value: Orbit (rviz_default_plugins)
-      Yaw: -0.6230000257492065
+      Yaw: 6.095188140869141
     Saved: ~
 Window Geometry:
   Displays:

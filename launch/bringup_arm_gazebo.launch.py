@@ -27,16 +27,9 @@ from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 
-def generate_launch_description():
+def generate_launch_description(kinova_arm_name='m1n6s200'):
     # Declare arguments
     declared_arguments = []
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            "kinova_arm",
-            default_value="m1n6s200",
-            description="Name of the robot to be used.",
-        )
-    )
     declared_arguments.append(
         DeclareLaunchArgument(
             "description_package",
@@ -82,7 +75,7 @@ def generate_launch_description():
     default_arguments = []
     default_arguments.append(
         LogInfo(
-            msg=PythonExpression(['"Using arm: ', LaunchConfiguration("kinova_arm"), '"']),
+            msg=f"Using arm: '{kinova_arm_name}'"
         )
     )
 
@@ -97,12 +90,10 @@ def generate_launch_description():
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
             PathJoinSubstitution(
-            #    [FindPackageShare(description_package), "urdf", "sensors", "realsense_standalone.urdf.xacro"]  # include base frame
                 [FindPackageShare(description_package), "urdf", "chris_kinova_lab.urdf.xacro"]  # include base frame
-            #    [FindPackageShare(description_package), "urdf", "m1n6s200_standalone.urdf.xacro"]  # include base frame
             ),
             " ",
-            "prefix:=m1n6s200 ",
+            f"prefix:={kinova_arm_name} ",
             "use_mock_hardware:=false ",
             "mock_sensor_commands:=false ",
             "sim_gazebo:=true ",
@@ -121,6 +112,8 @@ def generate_launch_description():
         executable="robot_state_publisher",
         output="both",
         parameters=[robot_description, {"use_sim_time": True}],
+        remappings=[('/joint_states', f'/{kinova_arm_name}/joint_states'),
+                    ]
     )
     rviz_node = Node(
         condition=IfCondition(LaunchConfiguration("use_rviz")),
@@ -162,14 +155,20 @@ def generate_launch_description():
         arguments=["-topic",
                    "robot_description", # _gazebo_content,
                    "-name",
-                   LaunchConfiguration("kinova_arm")],
+                   kinova_arm_name],
         output="screen",
     )
 
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+        arguments=["joint_state_broadcaster", "--controller-manager",
+                   "/controller_manager",
+                   # Below is one string!
+                   f"--controller-ros-args=--ros-args "
+                   f"--remap /joint_states:=/{kinova_arm_name}/joint_states "
+                   f"--remap /dynamic_joint_states:=/{kinova_arm_name}/dynamic_joint_states",
+        ],
     )
 
     robot_controller_names = [robot_controller, finger_controller]

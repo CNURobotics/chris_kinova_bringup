@@ -19,39 +19,48 @@ import launch
 import launch.events
 from launch_ros.actions import Node
 import xacro
+from launch import LaunchDescription
+from launch_ros.actions import Node
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
+from launch.conditions import IfCondition
+import os
 
 
 def generate_launch_description():
+    urdf_file = os.path.join(get_package_share_directory('chris_kinova_bringup'), 'urdf', 'chris_kinova_lab.urdf.xacro')
+    print(f"xacro path = '{urdf_file}'")
+    robot_description = xacro.process_file(urdf_file, mappings={'use_nominal_extrinsics': 'true', 'add_plug': 'true'}).toprettyxml(indent='  ')
 
-    rviz_config_dir = os.path.join(get_package_share_directory('chris_kinova_bringup'), 'config', 'model_view.rviz')
-    xacro_path = os.path.join(get_package_share_directory('chris_kinova_bringup'), 'urdf', 'chris_kinova_lab.urdf.xacro')
-    print(f"xacro path = '{xacro_path}'")
-    robot_description = xacro.process_file(xacro_path, mappings={'use_nominal_extrinsics': 'true', 'add_plug': 'true'}).toprettyxml(indent='  ')
-    print(robot_description)
 
-    rviz_node = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='rviz2',
-        output='screen',
-        arguments=['-d', rviz_config_dir],
-        parameters=[{'use_sim_time': False}]
-        )
-    model_node = Node(
-        name='model_node',
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        namespace='',
-        output='screen',
-        parameters=[{'robot_description': robot_description}]
-        )
+    return LaunchDescription([
+        DeclareLaunchArgument(
+            'gui', default_value='true', description='Flag to enable joint_state_publisher_gui'
+        ),
 
-    joint_state_publisher_node = Node(
-        package='joint_state_publisher',
-        executable='joint_state_publisher',
-        name='joint_state_publisher',
-        output='screen',
-        parameters=[{'use_sim_time': False}]
-    )
+        Node(
+            package='joint_state_publisher_gui',
+            executable='joint_state_publisher_gui',
+            condition=IfCondition(LaunchConfiguration('gui')),
+            name='joint_state_publisher'
+        ),
 
-    return launch.LaunchDescription([rviz_node, model_node, joint_state_publisher_node])
+        Node(
+            package='robot_state_publisher',
+            executable='robot_state_publisher',
+            name='robot_state_publisher',
+            parameters=[{'robot_description': robot_description}]
+        ),
+
+        Node(
+            package='rviz2',
+            executable='rviz2',
+            name='rviz2',
+            output='screen',
+            arguments=['-d', os.path.join(
+                get_package_share_directory('chris_kinova_bringup'),
+                'config',
+                'model_view.rviz'  # optional, or leave this line out for default view
+            )]
+        ),
+    ])

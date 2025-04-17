@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!-- m1_6n refers to mico v1 6DOF non-spherical -->
 
-
 <root xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz"
     xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model"
@@ -26,7 +25,7 @@
     <xacro:include filename="$(find chris_kinova_bringup)/urdf/kinova_finger_set.xacro" />
 
     <!-- Import all Gazebo-customization elements -->
-    <xacro:include filename="$(find chris_kinova_bringup)/urdf/kinova.gazebo" />
+    <xacro:include filename="$(find chris_kinova_bringup)/urdf/kinova.ros2_control.xacro" />
 
     <xacro:property name="link_base_mesh" value="base" />
     <xacro:property name="link_1_mesh" value="shoulder" />
@@ -122,8 +121,6 @@
     <xacro:property name="joint_end_effector_origin_xyz" value="0 0 -0.1600" />
     <xacro:property name="joint_end_effector_origin_rpy" value="${J_PI} 0 ${J_PI/2}" />
 
-
-
     <xacro:macro name="m1n6s200" params="base_parent
                 name:=m1n6s200
                 prefix:=m1n6s200
@@ -132,7 +129,8 @@
                 sim_gazebo:=^|false"
                >
 
-        <xacro:gazebo_config robot_namespace="${prefix}"
+        <!-- set up ros2 control and gazebo sim interfaces -->
+        <xacro:ros2_control_config robot_namespace="${prefix}"
                 use_mock_hardware="$(arg use_mock_hardware)"
                 mock_sensor_commands="$(arg mock_sensor_commands)"
                 sim_gazebo="$(arg sim_gazebo)"
@@ -165,7 +163,5 @@
 
         <xacro:kinova_2fingers link_hand="${prefix}_link_6" prefix="${prefix}_"/>
     </xacro:macro>
-
-
 
 </root>

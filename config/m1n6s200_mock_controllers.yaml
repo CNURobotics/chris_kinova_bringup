@@ -1,0 +1,70 @@
+# This config file is used by ros2_control
+controller_manager:
+  ros__parameters:
+    update_rate: 100  # Hz
+
+    mico_arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    mico_finger_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+mico_arm_controller:
+  ros__parameters:
+    joints:
+      - m1n6s200_joint_1
+      - m1n6s200_joint_2
+      - m1n6s200_joint_3
+      - m1n6s200_joint_4
+      - m1n6s200_joint_5
+      - m1n6s200_joint_6
+    command_interfaces:
+      - position  # Mock controllers use position interface
+    state_interfaces:
+      - position
+      - velocity
+    constraints:
+      goal_time: 1.0  # seconds allowed after trajectory end time
+      stopped_velocity_tolerance: 0.005  # how slow must joints be at end
+      m1n6s200_joint_1:
+        goal: 0.0025     # final position tolerance in radians
+        trajectory: 0.1  # maximum deviation during execution
+      m1n6s200_joint_2:
+        goal: 0.0025
+        trajectory: 0.1
+      m1n6s200_joint_3:
+        goal: 0.0025
+        trajectory: 0.1
+      m1n6s200_joint_4:
+        goal: 0.0025
+        trajectory: 0.1
+      m1n6s200_joint_5:
+        goal: 0.0025
+        trajectory: 0.1
+      m1n6s200_joint_6:
+        goal: 0.0025
+        trajectory: 0.1
+
+mico_finger_controller:
+  ros__parameters:
+    joints:
+      - m1n6s200_joint_finger_1
+      - m1n6s200_joint_finger_2
+    interface_name: velocity
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    constraints:
+      goal_time: 1.0  # seconds allowed after trajectory end time
+      stopped_velocity_tolerance: 0.005  # how slow must joints be at end
+      m1n6s200_joint_finger_1:
+        goal: 0.01       # final position tolerance in radians
+        trajectory: 0.2  # maximum deviation during execution
+      m1n6s200_joint_finger_1:
+        goal: 0.01
+        trajectory: 0.2

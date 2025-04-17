@@ -1,0 +1,3 @@
+#!/bin/bash
+SCRIPT_DIR=$(dirname "$(realpath "$0")")
+$WORKSPACE_ROOT/venv/bin/bokeh serve --show --port 5011 "$SCRIPT_DIR/live_gripper.py"

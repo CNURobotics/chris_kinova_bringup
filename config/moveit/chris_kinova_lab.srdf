@@ -64,6 +64,10 @@
         <joint name="m1n6s200_joint_finger_1" value="1.2" />
         <joint name="m1n6s200_joint_finger_2" value="1.2" />
     </group_state>
+    <group_state name="Squeeze" group="gripper">
+        <joint name="m1n6s200_joint_finger_1" value="1.5" />
+        <joint name="m1n6s200_joint_finger_2" value="1.5" />
+    </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="gripper" parent_link="m1n6s200_end_effector" group="gripper" parent_group="arm" />
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
