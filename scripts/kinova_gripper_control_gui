@@ -16,16 +16,15 @@ from sensor_msgs.msg import JointState
 import yaml
 from rosidl_runtime_py import message_to_ordereddict
 
-joint_positiion_limits = [(-2*pi, 2*pi), ((50/180)*pi, (310/180)*pi), ((35/180)*pi, (325/180)*pi),
-                          (-2*pi, 2*pi), (-2*pi, 2*pi), (-2*pi, 2*pi)]
+joint_positiion_limits = [(0.0, 1.51), (0.0, 1.51)]
+joint_vel_limits = [1., 1.]
+OPEN_POSITION = (0.0, 0.0)
+CLOSED_POSITION= (1.2, 1.2)
+SQUEEZE_POSITION= (1.5, 1.5)
 
-joint_vel_limits = [(36*pi/180), (36*pi/180), (36*pi/180), (48*pi/180), (48*pi/180), (48*pi/180)]
 
-HOME_POSITION=(4.80469, 2.92482, 1.002, 4.20319, 1.4458, 1.3233)
-RETRACT_POSITION=(4.7156, 2.6193, 0.6972, 4.7075, 0.0039, 1.5687)
-VERTICAL_POSITION=(0., 3.14, 3.14, 0.0, 0., 0.)
-
-NUM_JOINTS = 6
+joint_vel_limits = [1.0, 1.0]
+NUM_JOINTS = 2
 
 class SignalEmitter(QObject):
     update_status_signal = pyqtSignal(str)
@@ -34,7 +33,7 @@ class SignalEmitter(QObject):
 class TrajectoryGUI(Node):
     def __init__(self):
         super().__init__('slider_gui')
-        self.client = ActionClient(self, FollowJointTrajectory, '/mico_arm_controller/follow_joint_trajectory')
+        self.client = ActionClient(self, FollowJointTrajectory, '/mico_finger_controller/follow_joint_trajectory')
         self.prior_pos_cmd = None
         self.current_goal_handle = None
         self.max_time = 0.0
@@ -47,7 +46,7 @@ class TrajectoryGUI(Node):
             if dt > self.max_time:
                 self.max_time = dt
 
-        self.expected_joint_names = [f'm1n6s200_joint_{i+1}' for i in range(NUM_JOINTS)]
+        self.expected_joint_names = [f'm1n6s200_joint_finger_{i+1}' for i in range(NUM_JOINTS)]
         self.get_logger().info(f" Initialize TrajectoryGUI:  max duration = {self.max_time} s")
 
         self.current_joint_states = None
@@ -66,7 +65,6 @@ class TrajectoryGUI(Node):
 
         self.name_to_pos = {}
         self.timer = None
-
         self.signals = SignalEmitter()
         self.signals.update_status_signal.connect(self.update_status_safe)
         self.signals.update_joint_positions_signal.connect(self.update_joint_positions_safe)
@@ -75,7 +73,6 @@ class TrajectoryGUI(Node):
     def update_status_safe(self, text):
         if self.status_label is not None:
             self.status_label.setText(f"Status: {text}")
-
 
     def joint_state_callback(self, msg):
         # Filter only the joints we care about (optional)
@@ -101,6 +98,7 @@ class TrajectoryGUI(Node):
         except Exception as exc:
             print(f"Failed to update all joints: {exc}")
 
+
     def update_joint_positions(self):
         if self.current_joint_states is not None:
             self.signals.update_joint_positions_signal.emit(self.current_joint_states[:])
@@ -119,24 +117,23 @@ class TrajectoryGUI(Node):
         self.prior_pos_cmd = None
         self.get_logger().info(f"Force reset of sliders on next joint states message")
 
-    def set_home_position(self):
+    def set_open_position(self):
         for jnt, slider in enumerate(self.sliders):
             slider.blockSignals(True)  # prevent triggering signals
-            slider.setValue(int(HOME_POSITION[jnt]*100))
+            slider.setValue(int(OPEN_POSITION[jnt]*100))
             slider.blockSignals(False)  # enable triggering signals
 
-    def set_retract_position(self):
+    def set_closed_position(self):
         for jnt, slider in enumerate(self.sliders):
             slider.blockSignals(True)  # prevent triggering signals
-            slider.setValue(int(RETRACT_POSITION[jnt]*100))
+            slider.setValue(int(CLOSED_POSITION[jnt]*100))
             slider.blockSignals(False)  # enable triggering signals
 
-    def set_vertical_position(self):
+    def set_squeeze_position(self):
         for jnt, slider in enumerate(self.sliders):
             slider.blockSignals(True)  # prevent triggering signals
-            slider.setValue(int(VERTICAL_POSITION[jnt]*100))
+            slider.setValue(int(SQUEEZE_POSITION[jnt]*100))
             slider.blockSignals(False)  # enable triggering signals
-
 
     def on_cancel_done_callback(self, future):
         result = future.result()
@@ -155,8 +152,9 @@ class TrajectoryGUI(Node):
         self.get_logger().info(text)
         self.signals.update_status_signal.emit(text)
 
-
     def goal_done_callback(self, future):
+        print('-------------------', flush=True)
+        self.get_logger().info("Goal done callback {future} ...")
         result = future.result().result
         self.get_logger().info(f"Trajectory finished with status: {result}")
         self.update_status("Goal finished.")
@@ -175,11 +173,12 @@ class TrajectoryGUI(Node):
         self.update_status("Goal accepted.")
         result_future = goal_handle.get_result_async()
         result_future.add_done_callback(self.goal_done_callback)
+        self.get_logger().info("Set up the goal accepted callback ...")
 
     def send_joint_positions(self):
         if not self.client.wait_for_server(timeout_sec=0.05):
             if self.print_msg:
-                self.get_logger().error('Action server not available: /mico_arm_controller/follow_joint_trajectory')
+                self.get_logger().error('Action server not available: /mico_finger_controller/follow_joint_trajectory')
             self.print_msg  = not self.print_msg
             return
 
@@ -259,7 +258,7 @@ class TrajectoryGUI(Node):
         self.update_status("Sending goal...")
         msg_dict = message_to_ordereddict(goal_msg)
         yaml_str = yaml.dump(msg_dict, sort_keys=False)
-        #self.get_logger().info(f"Sending {yaml_str} trajectory ...")
+        self.get_logger().info(f"Sending {yaml_str} trajectory ...")
         self.get_logger().info(f"send: target position={point1.positions} @ {duration} ({point1.time_from_start})")
 
         send_future = self.client.send_goal_async(goal_msg)
@@ -297,23 +296,22 @@ def create_gui(node):
     node.reset_button = reset_button
 
     # ----------------------------
-
     gripper_layout = QHBoxLayout()
-    home_button = QPushButton("Home")
-    gripper_layout.addWidget(home_button)
-    home_button.clicked.connect(node.set_home_position)
-    home_button.setStyleSheet('background-color: blue')
+    open_button = QPushButton("Open")
+    gripper_layout.addWidget(open_button)
+    open_button.clicked.connect(node.set_open_position)
+    open_button.setStyleSheet('background-color: blue')
 
-    retract_button = QPushButton("Retract")
-    gripper_layout.addWidget(retract_button)
-    retract_button.clicked.connect(node.set_retract_position)
-    retract_button.setStyleSheet('background-color: cyan')
+    close_button = QPushButton("Close")
+    gripper_layout.addWidget(close_button)
+    close_button.clicked.connect(node.set_closed_position)
+    close_button.setStyleSheet('background-color: cyan')
 
-    vertical_button = QPushButton("Vertical")
-    gripper_layout.addWidget(vertical_button)
-    vertical_button.clicked.connect(node.set_vertical_position)
+    squeeze_button = QPushButton("Squeeze")
+    gripper_layout.addWidget(squeeze_button)
+    squeeze_button.clicked.connect(node.set_squeeze_position)
     layout.addLayout(gripper_layout)
-    vertical_button.setStyleSheet('background-color: magenta')
+    squeeze_button.setStyleSheet('background-color: magenta')
 
     # ----------------------------
 
@@ -368,6 +366,7 @@ def create_gui(node):
         app.exec()
     except Exception as exc:
         print(exc)
+
 
 def on_close(event):
     if rclpy.ok():
