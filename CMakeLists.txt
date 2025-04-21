@@ -14,6 +14,7 @@ install(DIRECTORY config launch meshes urdf
 
 install(PROGRAMS
   scripts/duckie
+  scripts/get_params
   scripts/kinova_controller_monitor
   scripts/kinova_gripper_monitor
   scripts/kinova_joint_control_gui

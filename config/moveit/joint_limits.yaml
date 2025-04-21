@@ -54,14 +54,14 @@ joint_limits:
     max_jerk: 50.0
   m1n6s200_joint_finger_1:
     has_velocity_limits: true
-    max_velocity: 5.0
+    max_velocity: 0.5
     has_acceleration_limits: true
     max_acceleration: 5.0
     has_jerk_limits: true
     max_jerk: 50.0
   m1n6s200_joint_finger_2:
     has_velocity_limits: true
-    max_velocity: 5.0
+    max_velocity: 0.5
     has_acceleration_limits: true
     max_acceleration: 5.0
     has_jerk_limits: true

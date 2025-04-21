@@ -125,8 +125,8 @@ mico_finger_controller:
       goal_time: 1.0  # seconds allowed after trajectory end time
       stopped_velocity_tolerance: 0.005  # how slow must joints be at end
       m1n6s200_joint_finger_1:
-        goal: 0.01       # final position tolerance in radians
-        trajectory: 0.2  # maximum deviation during execution
+        goal: 0.02       # final position tolerance in radians
+        trajectory: 0.3  # maximum deviation during execution
       m1n6s200_joint_finger_2:
-        goal: 0.01
-        trajectory: 0.2
+        goal: 0.02
+        trajectory: 0.3
